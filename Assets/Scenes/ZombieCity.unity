@@ -36980,7 +36980,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Text
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 2bc448395978f864ba745899e17c9633, type: 2}
   m_sharedMaterial: {fileID: -715687277990336941, guid: 2bc448395978f864ba745899e17c9633, type: 2}
@@ -57368,7 +57368,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Text
+  m_text: 0 / 0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 2bc448395978f864ba745899e17c9633, type: 2}
   m_sharedMaterial: {fileID: -715687277990336941, guid: 2bc448395978f864ba745899e17c9633, type: 2}
@@ -57395,8 +57395,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 72
+  m_fontSizeBase: 72
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -58331,6 +58331,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1634310948}
   - component: {fileID: 1634310947}
+  - component: {fileID: 1634310949}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -58375,6 +58376,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1634310949
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1634310946}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc57588a5d3a4096ad461fce428492ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1636099894 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5372839472002766991, guid: 3ff9c98c0990fce468bb0d49a51b6461, type: 3}
