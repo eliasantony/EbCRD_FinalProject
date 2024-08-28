@@ -6,6 +6,7 @@ public class GunConfig
     public float timeBetweenShooting;
     public float spread;
     public float reloadTime;
+    public float timeBetweenShots;
     public int magazineSize;
     public int bulletsPerTap;
     public bool allowButtonHold;

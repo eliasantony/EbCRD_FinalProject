@@ -71,4 +71,9 @@ public class PlayerHealth : MonoBehaviour
         float newHealth = Mathf.Min(health + healAmount, maxHealth);
         StartCoroutine(AnimateHealthChange(newHealth));
     }
+
+    public float GetCurrentHealth()
+    {
+        return health;
+    }
 }

@@ -3,43 +3,66 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    // Static instance of GameManager which allows it to be accessed by any other script.
     public static GameManager instance = null;
-
-    // Awake is always called before any Start functions
+    
+    public PlayerHealth playerHealth;
+    public PlayerPoints playerPoints;
+    
     void Awake()
     {
-        // Check if instance already exists
         if (instance == null)
         {
-            // If not, set instance to this
             instance = this;
         }
-        // If instance already exists and it's not this:
         else if (instance != this)
         {
-            // Then destroy this. This enforces our singleton pattern, meaning there can only ever be one instance of a GameManager.
             Destroy(gameObject);
         }
-
-        // Sets this to not be destroyed when reloading scene
+        
         DontDestroyOnLoad(gameObject);
-
-        // Call the InitGame function to initialize the first level 
+        
         InitGame();
     }
-
-    // Initial setup
+    
     void InitGame()
     {
-        // TODO: Add initialization logic here
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
-
-    // Update is called once per frame
+    
     void Update()
     {
         // TODO: Add game update logic here
+    }
+    
+    public void AddPoints(int points)
+    {
+        playerPoints.AddPoints(points);
+        UIManager.instance.UpdatePoints(playerPoints.points);
+    }
+
+    public bool SpendPoints(int amount)
+    {
+        bool success = playerPoints.SpendPoints(amount);
+        if (success)
+        {
+            UIManager.instance.UpdatePoints(playerPoints.points);
+        }
+        return success;
+    }
+
+    public void TakeDamage(float damage)
+    {
+        playerHealth.TakeDamage(damage);
+    }
+
+    public void HealPlayer(float healAmount)
+    {
+        playerHealth.Heal(healAmount);
+    }
+
+    public void UpdateHealthUI()
+    {
+        UIManager.instance.UpdateHealth(playerHealth.GetCurrentHealth());
     }
 }

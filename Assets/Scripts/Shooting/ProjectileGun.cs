@@ -20,8 +20,14 @@ public class ProjectileGun : MonoBehaviour
     public float timeBetweenShooting, spread, reloadTime, timeBetweenShots;
     public int magazineSize, bulletsPerTap;
     public bool allowButtonHold;
-    
-    int bulletsLeft, bulletsShot;
+
+    public int bulletsLeft;
+    int bulletsShot;
+
+    // Add fields for total ammo and ammo cost
+    [Header("Ammunition")]
+    public int totalAmmo;
+    public int ammoCost;
     
     // Recoil
     [Header("Recoil")]
@@ -39,8 +45,6 @@ public class ProjectileGun : MonoBehaviour
     [Header("Graphics")]
     public GameObject muzzleFlash;
     private bool muzzleFlashPlayed = false;
-    public TextMeshProUGUI ammunitionDisplay;
-    public TextMeshProUGUI reloadDisplay;
     
     // Bug Fixing
     public bool allowInvoke = true;
@@ -67,10 +71,17 @@ public class ProjectileGun : MonoBehaviour
         timeBetweenShooting = gunConfig.timeBetweenShooting;
         spread = gunConfig.spread;
         reloadTime = gunConfig.reloadTime;
+        timeBetweenShots = gunConfig.timeBetweenShots;
         magazineSize = gunConfig.magazineSize;
         bulletsPerTap = gunConfig.bulletsPerTap;
         allowButtonHold = gunConfig.allowButtonHold;
         recoilForce = gunConfig.recoilForce;
+        
+        bulletsLeft = magazineSize;
+        readyToShoot = true;
+
+        // Initialize total ammo
+        totalAmmo = magazineSize * 2; // Start with two magazines
     }
     
     private void Update()
@@ -78,19 +89,19 @@ public class ProjectileGun : MonoBehaviour
         MyInput();
         
         // Set ammo display
-        if(ammunitionDisplay != null)
-            ammunitionDisplay.SetText(bulletsLeft/bulletsPerTap + " / " + magazineSize/bulletsPerTap);
+        if(UIManager.instance != null)
+            UIManager.instance.UpdateAmmoDisplay(bulletsLeft/bulletsPerTap + " / " + totalAmmo/bulletsPerTap);
         
         // Set reload display
-        if(reloadDisplay != null)
+        if(UIManager.instance != null)
         {
             // Debug.Log("Reloading: " + reloading);
             if (bulletsLeft <= 0 && !reloading)
-                reloadDisplay.SetText("Press R to reload");
+                UIManager.instance.UpdateReloadDisplay("Press R to reload");
             else if (reloading)
-                reloadDisplay.SetText("Reloading...");
+                UIManager.instance.UpdateReloadDisplay("Reloading...");
             else
-                reloadDisplay.SetText("");
+                UIManager.instance.UpdateReloadDisplay("");
         }
     }
     
@@ -143,7 +154,7 @@ public class ProjectileGun : MonoBehaviour
         GameObject currentBullet = Instantiate(bullet, attackPoint.position, Quaternion.identity);
         // Rotate bullet to shoot direction
         currentBullet.transform.forward = directionWithSpread.normalized;
-        Destroy(currentBullet, 5f);
+        Destroy(currentBullet, 2f);
         
         // Add forces to bullet
         currentBullet.GetComponent<Rigidbody>().AddForce(directionWithSpread.normalized * shootForce, ForceMode.Impulse);
@@ -152,8 +163,12 @@ public class ProjectileGun : MonoBehaviour
         // Instantiate muzzle flash, if you have one
         if (muzzleFlash != null && !muzzleFlashPlayed)
         {
-            
             GameObject currentMuzzleFlash = Instantiate(muzzleFlash, attackPoint.position, Quaternion.identity);
+    
+            // Scale down the muzzle flash
+            float scaleValue = 0.5f; // adjust this value as needed
+            currentMuzzleFlash.transform.localScale = new Vector3(scaleValue, scaleValue, scaleValue);
+    
             // Destroy the muzzle flash after 1 second
             Destroy(currentMuzzleFlash, 0.5f);
             muzzleFlashPlayed = true;
@@ -168,8 +183,8 @@ public class ProjectileGun : MonoBehaviour
             allowInvoke = false;
             
             // Add recoil to player
-            // if(playerRb)           
-                // playerRb.AddForce(-directionWithSpread.normalized * recoilForce, ForceMode.Impulse);
+            if(playerRb)           
+                playerRb.AddForce(-directionWithSpread.normalized * recoilForce, ForceMode.Impulse);
         }
         
         if (bulletsShot < bulletsPerTap && bulletsLeft > 0)
@@ -187,14 +202,30 @@ public class ProjectileGun : MonoBehaviour
     
     private void Reload()
     {
-        Debug.Log("Reloading...");
-        reloading = true;
-        Invoke("ReloadFinished", reloadTime);
+        if (totalAmmo > 0)
+        {
+            reloading = true;
+            Invoke("ReloadFinished", reloadTime);
+        }
+        else
+        {
+            // Play empty ammo sound or feedback
+            Debug.Log("No ammo left!");
+        }
     }
     
     private void ReloadFinished()
     {
-        bulletsLeft = magazineSize;
+        int ammoNeeded = magazineSize - bulletsLeft;
+        int ammoToReload = Mathf.Min(ammoNeeded, totalAmmo);
+
+        bulletsLeft += ammoToReload;
+        totalAmmo -= ammoToReload;
         reloading = false;
+    }
+
+    public void AddAmmo(int amount)
+    {
+        totalAmmo += amount;
     }
 }
