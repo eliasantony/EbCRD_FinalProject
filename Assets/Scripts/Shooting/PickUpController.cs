@@ -15,6 +15,9 @@ public class PickUpController : MonoBehaviour
 
     public float pickUpRange;
     public float dropForwardForce, dropUpwardForce;
+    
+    private Vector3 originalPosition;
+    private Quaternion originalRotation;
 
     public bool equipped;
     public static bool slotFull;
@@ -23,6 +26,9 @@ public class PickUpController : MonoBehaviour
     {
         _inputManager = GameObject.FindGameObjectWithTag("Player").GetComponent<InputManager>();
         _uiManager = GameObject.FindGameObjectWithTag("UIManager").GetComponent<UIManager>();
+        
+        originalPosition = gunContainer.localPosition;
+        originalRotation = gunContainer.localRotation;
         //Setup
         if (!equipped)
         {
@@ -45,6 +51,7 @@ public class PickUpController : MonoBehaviour
         {
             transform.localPosition = Vector3.zero;
             transform.localRotation = Quaternion.identity;
+            HandleAiming();
         }
 
         //Check if player is in range and "E" is pressed while looking at the weapon
@@ -65,6 +72,20 @@ public class PickUpController : MonoBehaviour
         if (equipped && _inputManager._onFootActions.Drop.triggered)
         {
             Drop();
+        }
+    }
+    
+    private void HandleAiming()
+    {
+        if (Input.GetMouseButtonDown(1)) // Right mouse button pressed
+        {
+            gunContainer.localPosition = new Vector3(gunScript.aimSide, gunScript.aimHeight, 0.35f);
+            gunContainer.localRotation = Quaternion.Euler(0, -180, 0);
+        }
+        else if (Input.GetMouseButtonUp(1)) // Right mouse button released
+        {
+            gunContainer.localPosition = originalPosition;
+            gunContainer.localRotation = originalRotation;
         }
     }
 

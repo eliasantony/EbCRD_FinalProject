@@ -21,20 +21,25 @@ public class PlayerHealth : MonoBehaviour
         overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, 0);
     }
 
-    // Update is called once per frame
     void Update()
     {
         health = Mathf.Clamp(health, 0, maxHealth);
         UpdateHealthUI();
-        if(overlay.color.a > 0)
+
+        if (overlay.color.a > 0)
         {
             if (health < 30)
                 return;
             durationTimer += Time.deltaTime;
-            if(durationTimer > duration)
+            if (durationTimer > duration)
             {
                 overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, overlay.color.a - fadeSpeed * Time.deltaTime);
             }
+        }
+
+        if (GetComponent<PlayerHunger>().IsFull())
+        {
+            Heal(0.5f * Time.deltaTime); // Heal slowly when the hunger bar is full
         }
     }
 
@@ -45,7 +50,6 @@ public class PlayerHealth : MonoBehaviour
     
     IEnumerator AnimateHealthChange(float newHealth)
     {
-        Debug.Log("Animating health change");
         float elapsed = 0;
         float duration = 0.5f; // duration of the animation in seconds
         float oldHealth = health;

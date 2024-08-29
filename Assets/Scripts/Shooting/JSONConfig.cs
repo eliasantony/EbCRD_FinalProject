@@ -11,6 +11,8 @@ public class GunConfig
     public int bulletsPerTap;
     public bool allowButtonHold;
     public float recoilForce;
+    public float aimHeight;
+    public float aimSide;
 }
 
 [System.Serializable]

@@ -6,50 +6,49 @@ using UnityEngine.AI;
 public class Enemy : MonoBehaviour
 {
     [Header("Enemy Stats")]
-    public float health; // Set the initial health of the enemy
-    public float maxHealth; // Set the max health of the enemy
-    public float speed;  // Set the speed of the enemy
-    public float attackRange; // Set the attack range of the enemy
-    public float attackDamage; // Set the attack damage of the enemy
-    public float attackCooldown; // Set the attack cooldown of the enemy
-    private float lastAttackTime; // Set the last attack time of the enemy
+    public float health;
+    public float maxHealth;
+    public float speed;
+    public float attackRange;
+    public float attackDamage;
+    public float attackCooldown;
+    private float lastAttackTime;
     
     // Reference to the Player
     private PlayerHealth player;
 
     [Header("Health Bar")]
-    public GameObject healthBarUI; // Reference to the health bar UI
-    public Slider healthBar; // Reference to the health bar
+    public GameObject healthBarUI;
+    public Slider healthBar;
 
-    private Transform playerTransform; // Reference to the player's transform
-    public NavMeshAgent agent; // Reference to the NavMeshAgent
-    private Animator animator; // Reference to the Animator
+    private Transform playerTransform;
+    public NavMeshAgent agent;
+    //private Animator animator;
     
     private WaveManager waveManager;
-    private bool isDead = false; // Track if the enemy is dead
+    private bool isDead = false;
 
     public void Start()
     {
-        health = maxHealth; // Set the initial health to max health
-        healthBar.value = CalculateHealth(); // Set the health bar value
-        player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>(); // Get the PlayerHealth script
-        playerTransform = GameObject.FindGameObjectWithTag("Player").transform; // Get the player's transform
-        agent = GetComponent<NavMeshAgent>(); // Get the NavMeshAgent component
-        agent.speed = speed; // Set the speed of the NavMeshAgent
-        animator = GetComponent<Animator>(); // Get the Animator component
-        waveManager = GameObject.FindObjectOfType<WaveManager>(); // Get the WaveManager script
+        health = maxHealth;
+        healthBar.value = CalculateHealth();
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>();
+        playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
+        agent = GetComponent<NavMeshAgent>();
+        agent.speed = speed;
+        //animator = GetComponent<Animator>();
+        waveManager = GameObject.FindObjectOfType<WaveManager>();
     }
-
-    // Update is called once per frame
+    
     void Update()
     {
-        if (isDead) return; // If dead, don't perform any more actions
+        if (isDead) return; 
 
-        healthBar.value = CalculateHealth(); // Update the health bar value
+        healthBar.value = CalculateHealth();
 
         if (health < maxHealth)
         {
-            healthBarUI.SetActive(true); // Show the health bar UI
+            healthBarUI.SetActive(true);
         }
         if (health <= 0)
         {
@@ -61,16 +60,17 @@ public class Enemy : MonoBehaviour
             health = maxHealth;
         }
 
-        // Make the enemy face the player only on the y-axis
+        
         Vector3 direction = playerTransform.position - transform.position;
-        direction.y = 0; // This makes the enemy not look up/down
+        direction.y = 0;
         transform.rotation = Quaternion.LookRotation(direction);
 
-        agent.SetDestination(playerTransform.position); // Set the destination of the NavMeshAgent to the player's position
+        //agent.SetDestination(playerTransform.position); 
+        //animator.SetFloat("MoveSpeed", agent.velocity.magnitude);
         
-        // Set animator parameter for movement
-        animator.SetFloat("MoveSpeed", agent.velocity.magnitude);
-
+        Debug.Log("Distance to player: " + Vector3.Distance(transform.position, playerTransform.position));
+        // Debug.Log("Distance to player (Agent): " + agent.remainingDistance(playerTransform.position));
+        
         if (Vector3.Distance(transform.position, playerTransform.position) <= attackRange 
             && Time.time - lastAttackTime >= attackCooldown) // Check if enough time has passed since the last attack
         {
@@ -81,6 +81,7 @@ public class Enemy : MonoBehaviour
 
     public void TakeDamage(string damageType)
     {
+        Debug.Log("Taking damage from: " + damageType);
         switch (damageType)
         {
             case "Bullet":
@@ -105,15 +106,13 @@ public class Enemy : MonoBehaviour
 
     void Attack()
     {
-        // Set animator parameter for attack
-        animator.SetTrigger("Attack");
-        
+        Debug.Log("Attacking player");
+        //animator.SetTrigger("Attack");
         Invoke("DealDamage", 0.5f);
     }
     
     void DealDamage()
     {
-        // Decrease the player's health
         player.TakeDamage(attackDamage);
     }
 
@@ -127,9 +126,8 @@ public class Enemy : MonoBehaviour
         if (isDead) return; // Ensure Die is only called once
 
         isDead = true; // Mark the enemy as dead
-
-        // Set animator parameter for death
-        animator.SetBool("Dead", true);
+        
+        //animator.SetBool("Dead", true);
         
         agent.isStopped = true; // Stop the enemy from moving
         

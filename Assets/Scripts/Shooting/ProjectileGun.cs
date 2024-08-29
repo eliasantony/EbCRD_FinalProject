@@ -17,7 +17,7 @@ public class ProjectileGun : MonoBehaviour
     // Gun stats
     [Header("Gun Stats")]
     public string weaponName;
-    public float timeBetweenShooting, spread, reloadTime, timeBetweenShots;
+    public float timeBetweenShooting, spread, aimSpread, reloadTime, timeBetweenShots;
     public int magazineSize, bulletsPerTap;
     public bool allowButtonHold;
 
@@ -33,6 +33,15 @@ public class ProjectileGun : MonoBehaviour
     [Header("Recoil")]
     public Rigidbody playerRb;
     public float recoilForce;
+    
+    // Aiming
+    [Header("Aiming")]
+    private float normalFOV;
+    public float aimFOV = 30f;
+    public float aimSpreadMultiplier = 0.5f;
+    internal float aimHeight;
+    internal float aimSide;
+    private float normalSpread;
     
     // Bools
     bool shooting, readyToShoot, reloading;
@@ -55,6 +64,8 @@ public class ProjectileGun : MonoBehaviour
     private void Awake()
     {
         _inputManager = GameObject.FindGameObjectWithTag("Player").GetComponent<InputManager>();
+        normalFOV = fpsCam.fieldOfView;
+        
         // Make sure magazine is full
         bulletsLeft = magazineSize;
         readyToShoot = true;
@@ -70,6 +81,10 @@ public class ProjectileGun : MonoBehaviour
         upwardForce = gunConfig.upwardForce;
         timeBetweenShooting = gunConfig.timeBetweenShooting;
         spread = gunConfig.spread;
+        normalSpread = spread;
+        aimSpread = spread * aimSpreadMultiplier;
+        aimHeight = gunConfig.aimHeight;
+        aimSide = gunConfig.aimSide;
         reloadTime = gunConfig.reloadTime;
         timeBetweenShots = gunConfig.timeBetweenShots;
         magazineSize = gunConfig.magazineSize;
@@ -86,8 +101,29 @@ public class ProjectileGun : MonoBehaviour
     
     private void Update()
     {
+        HandleAiming();
         MyInput();
-        
+        UpdateUI();
+    }
+    
+    private void HandleAiming()
+    {
+        if (Input.GetKey(KeyCode.Mouse1))
+        {
+            fpsCam.fieldOfView = Mathf.Lerp(fpsCam.fieldOfView, aimFOV, Time.deltaTime * 5);
+                        
+            spread = normalSpread * aimSpreadMultiplier;
+        }
+        else
+        {
+            fpsCam.fieldOfView = Mathf.Lerp(fpsCam.fieldOfView, normalFOV, Time.deltaTime * 5);
+
+            spread = normalSpread;
+        }
+    }
+
+    private void UpdateUI()
+    {
         // Set ammo display
         if(UIManager.instance != null)
             UIManager.instance.UpdateAmmoDisplay(bulletsLeft/bulletsPerTap + " / " + totalAmmo/bulletsPerTap);

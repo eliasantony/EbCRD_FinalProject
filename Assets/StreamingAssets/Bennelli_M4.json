@@ -8,5 +8,7 @@
   "magazineSize": 48,
   "bulletsPerTap": 6,
   "allowButtonHold": false,
-  "recoilForce": 0
+  "recoilForce": 0,
+  "aimHeight": -0.03,
+  "aimSide": 0
 }

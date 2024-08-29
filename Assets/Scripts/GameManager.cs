@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -28,6 +29,8 @@ public class GameManager : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        
+        AddPoints(1000);
     }
     
     void Update()
@@ -49,16 +52,6 @@ public class GameManager : MonoBehaviour
             UIManager.instance.UpdatePoints(playerPoints.points);
         }
         return success;
-    }
-
-    public void TakeDamage(float damage)
-    {
-        playerHealth.TakeDamage(damage);
-    }
-
-    public void HealPlayer(float healAmount)
-    {
-        playerHealth.Heal(healAmount);
     }
 
     public void UpdateHealthUI()
