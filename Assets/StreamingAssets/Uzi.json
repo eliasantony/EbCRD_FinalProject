@@ -10,5 +10,7 @@
   "allowButtonHold": true,
   "recoilForce": 0,
   "aimHeight": -0.07,
-  "aimSide": 0
+  "aimSide": 0,
+  "price": 3000,
+  "ammoCost": 700
 }

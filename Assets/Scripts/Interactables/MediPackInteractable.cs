@@ -4,20 +4,33 @@ using UnityEngine;
 
 public class MediPackInteractable : Interactable
 {
-    // Start is called before the first frame update
-    void Start()
+    public int mediPackPrice = 200; // Set price for medipack
+    public float healAmount = 50f; // Amount to heal
+    private GameObject player;
+
+    private void Start()
     {
-        
+        promptMessage = $"Buy Health for {mediPackPrice} points";
+        player = GameObject.FindGameObjectWithTag("Player");
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-    
     protected override void Interact()
     {
-        Debug.Log("Healing player");
+        // Check if the player has enough points
+        if (GameManager.instance.SpendPoints(mediPackPrice))
+        {
+            // Logic for healing the player
+            PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
+            if (playerHealth != null && playerHealth.GetCurrentHealth() < playerHealth.maxHealth)
+            {
+                playerHealth.Heal(healAmount);
+                Debug.Log("Medipack purchased! Health increased.");
+            }
+        }
+        else
+        {
+            Debug.Log("Not enough points to purchase medipack.");
+            UIManager.instance.UpdatePromptMessage("Not enough points to purchase medipack.");
+        }
     }
 }

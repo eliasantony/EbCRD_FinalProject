@@ -130,7 +130,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 1
   m_Constraints: 0
@@ -152,11 +152,11 @@ MonoBehaviour:
   whatIsEnemies:
     serializedVersion: 2
     m_Bits: 128
-  damageType: normal
+  damageType: Bullet
   bounciness: 0
   useGravity: 0
   explosionDamage: 20
-  explosionRange: 0.02
+  explosionRange: 0.1
   explosionForce: 0.2
   maxCollisions: 0
   maxLifetime: 2

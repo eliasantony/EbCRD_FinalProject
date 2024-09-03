@@ -2,17 +2,33 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FoodInteractable : MonoBehaviour
+public class FoodInteractable : Interactable
 {
-    // Start is called before the first frame update
-    void Start()
+    public int foodPrice = 300; // Set price for food
+    public float hungerAmount = 20f; // Amount to increase hunger
+    private GameObject player;
+
+    private void Start()
     {
-        
+        promptMessage = $"Buy Food for {foodPrice} points";
+        player = GameObject.FindGameObjectWithTag("Player");
     }
 
-    // Update is called once per frame
-    void Update()
+    protected override void Interact()
     {
-        
+        if (GameManager.instance.SpendPoints(foodPrice))
+        {
+            PlayerHunger playerHunger = player.GetComponent<PlayerHunger>();
+            if (playerHunger != null && !playerHunger.IsFull())
+            {
+                playerHunger.EatFood(hungerAmount);
+                Debug.Log("Food purchased! Hunger increased.");
+            }
+        }
+        else
+        {
+            Debug.Log("Not enough points to purchase food.");
+            UIManager.instance.UpdatePromptMessage("Not enough points to purchase food.");
+        }
     }
 }

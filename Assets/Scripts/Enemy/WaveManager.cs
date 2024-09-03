@@ -1,55 +1,37 @@
 using UnityEngine;
 using System.Collections;
 using TMPro;
+using UnityEngine.AI;
 
 public class WaveManager : MonoBehaviour
 {
     [Header("Wave Settings")]
     public GameObject zombiePrefab; // The zombie prefab to spawn
-    public float spawnRadius = 20f; // Radius around the player to spawn zombies
+    public float spawnRadius = 20f; // Radius around the player to attempt spawning zombies
     public int numberOfSpawnPoints = 8; // Number of spawn points
     public int initialWaveSize = 5; // Initial number of zombies per wave
-    public float timeBetweenWaves = 10f; // Time between waves
+    public float timeBetweenWaves = 20f; // Time between waves
     public float waveMultiplier = 1.5f; // Multiplier to increase wave size
     public float spawnInterval = 1f; // Time between each zombie spawn
-
-    [Header("UI Settings")]
-    public TextMeshProUGUI waveText; // Reference to the TextMeshProUGUI for wave display
-    public TextMeshProUGUI timerText; // Reference to the TextMeshProUGUI for timer display
 
     private int currentWave = 0; // The current wave number
     private int zombiesToSpawn; // Number of zombies to spawn in the current wave
     private int zombiesRemaining; // Number of zombies remaining in the current wave
     private Transform playerTransform; // Reference to the player's transform
-    private Transform[] spawnPoints; // Array of spawn points
     private bool waveInProgress = false; // Flag to track if a wave is in progress
 
-    void Start()
+    private void Start()
     {
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
-        CreateSpawnPoints();
         StartCoroutine(WaitAndStartNextWave());
     }
 
-    void Update()
+    private void Update()
     {
         if (zombiesRemaining <= 0 && !waveInProgress)
         {
+            Debug.Log("Wave complete! Starting next wave...");
             StartCoroutine(WaitAndStartNextWave());
-        }
-    }
-
-    void CreateSpawnPoints()
-    {
-        spawnPoints = new Transform[numberOfSpawnPoints];
-        for (int i = 0; i < numberOfSpawnPoints; i++)
-        {
-            float angle = i * Mathf.PI * 2 / numberOfSpawnPoints;
-            Vector3 spawnPosition = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * spawnRadius;
-            spawnPosition += playerTransform.position;
-            GameObject spawnPoint = new GameObject("SpawnPoint" + i);
-            spawnPoint.transform.position = spawnPosition;
-            spawnPoints[i] = spawnPoint.transform;
         }
     }
 
@@ -62,12 +44,10 @@ public class WaveManager : MonoBehaviour
 
         for (float timer = timeBetweenWaves; timer > 0; timer -= Time.deltaTime)
         {
-            waveText.text = "Wave " + currentWave;
-            timerText.text = "Next wave in: " + Mathf.Ceil(timer).ToString() + "s";
+            UIManager.instance.UpdateWaveNumber(currentWave);
+            UIManager.instance.UpdateWaveTimer(timer);
             yield return null;
         }
-
-        timerText.text = "";
 
         StartCoroutine(SpawnZombies());
     }
@@ -76,26 +56,53 @@ public class WaveManager : MonoBehaviour
     {
         for (int i = 0; i < zombiesToSpawn; i++)
         {
-            SpawnZombie();
+            Vector3 spawnPosition = FindValidSpawnPosition();
+            if (spawnPosition != Vector3.zero) // If a valid position is found
+            {
+                Instantiate(zombiePrefab, spawnPosition, Quaternion.identity);
+            }
             yield return new WaitForSeconds(spawnInterval);
         }
 
         waveInProgress = false;
     }
 
-    void SpawnZombie()
+    Vector3 FindValidSpawnPosition()
     {
-        Debug.Log("Spawning zombie");
-        int spawnIndex = Random.Range(0, spawnPoints.Length);
-        Instantiate(zombiePrefab, spawnPoints[spawnIndex].position, spawnPoints[spawnIndex].rotation);
+        for (int attempts = 0; attempts < 25; attempts++)
+        {
+            Vector3 randomDirection = Random.insideUnitSphere * spawnRadius;
+            randomDirection += playerTransform.position;
+            NavMeshHit hit;
+            // Use NavMesh.SamplePosition to check if the point is on the NavMesh
+            if (NavMesh.SamplePosition(randomDirection, out hit, 2f, NavMesh.AllAreas))
+            {
+                if (hit.position.y < 1.5f) // Ensure the spawn is not on a rooftop or above the ground floor level
+                {
+                    // Ensure the point is at a reasonable distance from the player
+                    if (Vector3.Distance(hit.position, playerTransform.position) > 5f) 
+                    {
+                        return hit.position;
+                    }
+                }
+            }
+        }
+        Debug.LogWarning("Failed to find a valid spawn position after 15 attempts.");
+        return Vector3.zero; // Return zero vector if no valid position found
     }
 
     public void ZombieKilled()
     {
         zombiesRemaining--;
-        Debug.Log("Zombie killed! Zombies remaining: " + zombiesRemaining);
+        Debug.Log("Zombie killed! Zombies remaining: " + zombiesRemaining + " / " + zombiesToSpawn);
+
+        // Start countdown to next wave if all zombies are dead
+        if (zombiesRemaining <= 0 && !waveInProgress)
+        {
+            StartCoroutine(WaitAndStartNextWave());
+        }
     }
-    
+
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;

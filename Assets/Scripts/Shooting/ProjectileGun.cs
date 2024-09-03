@@ -18,7 +18,7 @@ public class ProjectileGun : MonoBehaviour
     [Header("Gun Stats")]
     public string weaponName;
     public float timeBetweenShooting, spread, aimSpread, reloadTime, timeBetweenShots;
-    public int magazineSize, bulletsPerTap;
+    public int magazineSize, bulletsPerTap, price;
     public bool allowButtonHold;
 
     public int bulletsLeft;
@@ -60,6 +60,7 @@ public class ProjectileGun : MonoBehaviour
     
     // Config Loader
     public ConfigLoader configLoader;
+    public bool isPurchased = false;
     
     private void Awake()
     {
@@ -91,6 +92,8 @@ public class ProjectileGun : MonoBehaviour
         bulletsPerTap = gunConfig.bulletsPerTap;
         allowButtonHold = gunConfig.allowButtonHold;
         recoilForce = gunConfig.recoilForce;
+        price = gunConfig.price;
+        ammoCost = gunConfig.ammoCost;
         
         bulletsLeft = magazineSize;
         readyToShoot = true;
@@ -133,11 +136,11 @@ public class ProjectileGun : MonoBehaviour
         {
             // Debug.Log("Reloading: " + reloading);
             if (bulletsLeft <= 0 && !reloading)
-                UIManager.instance.UpdateReloadDisplay("Press R to reload");
+                UIManager.instance.UpdateReloadingText("Press R to reload");
             else if (reloading)
-                UIManager.instance.UpdateReloadDisplay("Reloading...");
+                UIManager.instance.UpdateReloadingText("Reloading...");
             else
-                UIManager.instance.UpdateReloadDisplay("");
+                UIManager.instance.UpdateReloadingText("");
         }
     }
     
@@ -260,8 +263,36 @@ public class ProjectileGun : MonoBehaviour
         reloading = false;
     }
 
+    // Method to add ammo
     public void AddAmmo(int amount)
     {
         totalAmmo += amount;
+    }
+
+    // Save and load ammo states when the gun is picked up or dropped
+    public void SaveAmmoState()
+    {
+        PlayerPrefs.SetInt(weaponName + "_bulletsLeft", bulletsLeft);
+        PlayerPrefs.SetInt(weaponName + "_totalAmmo", totalAmmo);
+        PlayerPrefs.Save();
+    }
+
+    public void LoadAmmoState()
+    {
+        if (PlayerPrefs.HasKey(weaponName + "_bulletsLeft"))
+        {
+            bulletsLeft = PlayerPrefs.GetInt(weaponName + "_bulletsLeft");
+            totalAmmo = PlayerPrefs.GetInt(weaponName + "_totalAmmo");
+        }
+        else
+        {
+            bulletsLeft = magazineSize;
+            totalAmmo = magazineSize * 2;
+        }
+    }
+    
+    public void MarkAsPurchased()
+    {
+        isPurchased = true;
     }
 }

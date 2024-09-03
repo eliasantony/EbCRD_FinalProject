@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class PlayerHealth : MonoBehaviour
 {
     private float health;
-    private float maxHealth = 100;
+    internal float maxHealth = 100;
     public Image healthBar;
 
     [Header("Damage Overlay")]
@@ -66,7 +66,7 @@ public class PlayerHealth : MonoBehaviour
     {
         float newHealth = Mathf.Max(health - damage, 0);
         durationTimer = 0;
-        overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, 1);
+        overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, 0.7f);
         StartCoroutine(AnimateHealthChange(newHealth));
     }
 

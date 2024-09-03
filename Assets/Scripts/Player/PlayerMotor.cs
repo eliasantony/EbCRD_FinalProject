@@ -9,7 +9,6 @@ public class PlayerMotor : MonoBehaviour
     private bool _isGrounded;
     private GameObject _gunHolder;
     private bool _weaponEquipped;
-    private bool isAiming;
     
     public float aimSpeed = 2.5f;
     public float speed = 5.0f;
@@ -53,12 +52,10 @@ public class PlayerMotor : MonoBehaviour
     {
         if (_weaponEquipped && Input.GetKey(KeyCode.Mouse1))
         {
-            isAiming = true;
             speed = aimSpeed;
         }
         else
         {
-            isAiming = false;
             speed = _sprinting ? 10.0f : 5.0f;
         }
     }

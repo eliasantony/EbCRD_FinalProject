@@ -13,6 +13,8 @@ public class GunConfig
     public float recoilForce;
     public float aimHeight;
     public float aimSide;
+    public int price;
+    public int ammoCost;
 }
 
 [System.Serializable]

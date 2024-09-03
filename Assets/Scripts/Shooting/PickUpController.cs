@@ -11,7 +11,6 @@ public class PickUpController : MonoBehaviour
     public BoxCollider coll;
     public Transform player, gunContainer, fpsCam;
     private InputManager _inputManager;
-    private UIManager _uiManager;
 
     public float pickUpRange;
     public float dropForwardForce, dropUpwardForce;
@@ -20,16 +19,16 @@ public class PickUpController : MonoBehaviour
     private Quaternion originalRotation;
 
     public bool equipped;
-    public static bool slotFull;
+    public bool slotFull; // Removed static keyword
 
     private void Start()
     {
         _inputManager = GameObject.FindGameObjectWithTag("Player").GetComponent<InputManager>();
-        _uiManager = GameObject.FindGameObjectWithTag("UIManager").GetComponent<UIManager>();
         
         originalPosition = gunContainer.localPosition;
         originalRotation = gunContainer.localRotation;
-        //Setup
+        
+        // Setup
         if (!equipped)
         {
             gunScript.enabled = false;
@@ -42,6 +41,7 @@ public class PickUpController : MonoBehaviour
             rb.isKinematic = true;
             coll.isTrigger = true;
             slotFull = true;
+            gunScript.LoadAmmoState();
         }
     }
 
@@ -54,21 +54,22 @@ public class PickUpController : MonoBehaviour
             HandleAiming();
         }
 
-        //Check if player is in range and "E" is pressed while looking at the weapon
-        if (!equipped && _inputManager._onFootActions.Interact.triggered && !slotFull)
+        // Check if player is in range of the weapon
+        Ray ray = fpsCam.GetComponent<Camera>().ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, pickUpRange))
         {
-            Ray ray = fpsCam.GetComponent<Camera>().ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, pickUpRange))
+            if (hit.transform == transform)
             {
-                if (hit.transform == transform)
+                ShowPromptMessage();
+                if (!equipped && _inputManager._onFootActions.Interact.triggered && !slotFull)
                 {
-                    PickUp();
+                    AttemptPickUp();
                 }
             }
         }
 
-        //Drop if equipped and "Q" is pressed
+        // Drop if equipped and "Q" is pressed
         if (equipped && _inputManager._onFootActions.Drop.triggered)
         {
             Drop();
@@ -88,25 +89,60 @@ public class PickUpController : MonoBehaviour
             gunContainer.localRotation = originalRotation;
         }
     }
+    
+    private void ShowPromptMessage()
+    {
+        if (!gunScript.isPurchased)
+        {
+            UIManager.instance.UpdatePromptMessage($"Press E to buy {gunScript.weaponName} for {gunScript.price} points.");
+        }
+        else
+        {
+            UIManager.instance.UpdatePromptMessage("Press E to pick up the weapon.");
+        }
+    }
+    
+    private void AttemptPickUp()
+    {
+        if (!gunScript.isPurchased)
+        {
+            if (GameManager.instance.PurchaseGun(gunScript))
+            {
+                PickUp();
+                gunScript.MarkAsPurchased();
+            }
+            else
+            {
+                UIManager.instance.UpdatePromptMessage("Not enough points to purchase this weapon!");
+            }
+        }
+        else
+        {
+            PickUp();
+        }
+    }
 
     private void PickUp()
     {
         equipped = true;
         slotFull = true;
 
-        //Make weapon a child of the camera and move it to default position
+        // Make weapon a child of the camera and move it to default position
         transform.SetParent(gunContainer);
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.identity;
         transform.localScale = Vector3.one;
-        
 
-        //Make Rigidbody kinematic and BoxCollider a trigger
+        // Make Rigidbody kinematic and BoxCollider a trigger
         rb.isKinematic = true;
         coll.isTrigger = true;
 
-        //Enable script
+        // Enable script
         gunScript.enabled = true;
+        gunScript.LoadAmmoState();
+
+        // Clear prompt after pickup
+        UIManager.instance.UpdatePromptMessage("");
     }
 
     private void Drop()
@@ -114,27 +150,28 @@ public class PickUpController : MonoBehaviour
         equipped = false;
         slotFull = false;
 
-        //Set parent to null
+        // Set parent to null
         transform.SetParent(null);
 
-        //Make Rigidbody not kinematic and BoxCollider normal
+        // Make Rigidbody not kinematic and BoxCollider normal
         rb.isKinematic = false;
         coll.isTrigger = false;
 
-        //Gun carries momentum of player
+        // Gun carries momentum of player
         rb.velocity = player.GetComponent<CharacterController>().velocity;
 
-        //AddForce
+        // Add forces
         rb.AddForce(fpsCam.forward * dropForwardForce, ForceMode.Impulse);
         rb.AddForce(fpsCam.up * dropUpwardForce, ForceMode.Impulse);
-        //Add random rotation
+        // Add random rotation
         float random = Random.Range(-1f, 1f);
         rb.AddTorque(new Vector3(random, random, random) * 10);
 
         // Disable the Ammo UI
         UIManager.instance.UpdateAmmoDisplay("");
-        
-        //Disable script
+
+        // Save ammo state and disable script
+        gunScript.SaveAmmoState();
         gunScript.enabled = false;
     }
 }

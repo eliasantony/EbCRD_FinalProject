@@ -1,27 +1,26 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CustomBullet : MonoBehaviour
 {
-    //Assignables
+    // Assignables
     public Rigidbody rb;
     public GameObject explosion;
-    public LayerMask whatIsEnemies;
+    public LayerMask whatIsEnemies; // Ensure this is set correctly in Unity Inspector
     public string damageType;
 
-    //Stats
-    [Range(0f,1f)]
+    // Stats
+    [Range(0f, 1f)]
     public float bounciness;
     public bool useGravity;
 
-    //Damage
+    // Damage
     public int explosionDamage;
     public float explosionRange;
     public float explosionForce;
 
-    //Lifetime
+    // Lifetime
     public int maxCollisions;
     public float maxLifetime;
     public bool explodeOnTouch = true;
@@ -36,38 +35,38 @@ public class CustomBullet : MonoBehaviour
 
     private void Update()
     {
-        //When to explode:
+        // Check if bullet should explode
         if (collisions > maxCollisions) Explode();
 
-        //Count down lifetime
+        // Count down lifetime
         maxLifetime -= Time.deltaTime;
         if (maxLifetime <= 0) Explode();
     }
 
     private void Explode()
     {
-        //Instantiate explosion
+        // Instantiate explosion effect if available
         if (explosion != null) Instantiate(explosion, transform.position, Quaternion.identity);
 
-        //Check for enemies 
+        // Check for enemies in the explosion radius
         Collider[] enemies = Physics.OverlapSphere(transform.position, explosionRange, whatIsEnemies);
         for (int i = 0; i < enemies.Length; i++)
         {
-            //Get component of enemy and call Take Damage
             Enemy enemy = enemies[i].GetComponent<Enemy>();
             if (enemy != null)
             {
-                enemy.TakeDamage(damageType);
+                enemy.TakeDamage(damageType); // Ensure TakeDamage is properly implemented
             }
 
-            //Add explosion force (if enemy has a rigidbody)
+            // Apply explosion force if the enemy has a rigidbody
             if (enemies[i].GetComponent<Rigidbody>())
                 enemies[i].GetComponent<Rigidbody>().AddExplosionForce(explosionForce, transform.position, explosionRange);
         }
 
-        //Add a little delay, just to make sure everything works fine
+        // Destroy the bullet with a slight delay
         Invoke("Delay", 0.05f);
     }
+
     private void Delay()
     {
         Destroy(gameObject);
@@ -75,31 +74,30 @@ public class CustomBullet : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        //Don't count collisions with other bullets
+        // Ignore collisions with other bullets
         if (collision.collider.CompareTag("Bullet")) return;
 
-        //Count up collisions
+        // Increment collision count
         collisions++;
 
-        //Explode if bullet hits an enemy directly and explodeOnTouch is activated
+        // Explode if bullet hits an enemy directly and explodeOnTouch is activated
         if (collision.collider.CompareTag("Enemy") && explodeOnTouch) Explode();
     }
 
     private void Setup()
     {
-        //Create a new Physic material
+        // Create a new physic material for bounciness
         physics_mat = new PhysicMaterial();
         physics_mat.bounciness = bounciness;
         physics_mat.frictionCombine = PhysicMaterialCombine.Minimum;
         physics_mat.bounceCombine = PhysicMaterialCombine.Maximum;
-        //Assign material to collider
         GetComponent<SphereCollider>().material = physics_mat;
 
-        //Set gravity
+        // Set gravity on the rigidbody
         rb.useGravity = useGravity;
     }
 
-    /// Just to visualize the explosion range
+    // Just to visualize the explosion range in the editor
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;

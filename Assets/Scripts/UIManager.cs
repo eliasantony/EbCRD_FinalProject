@@ -9,8 +9,11 @@ public class UIManager : MonoBehaviour
     public static UIManager instance;
     
     public TextMeshProUGUI ammunitionDisplay;
-    public TextMeshProUGUI promptDisplay;
+    public TextMeshProUGUI reloadingText;
+    public TextMeshProUGUI promptMessage;
     public TextMeshProUGUI pointsText;
+    public TextMeshProUGUI waveNumber;
+    public TextMeshProUGUI waveTimer;
     
     public Image healthBar;
     public Image hungerBar;
@@ -28,6 +31,25 @@ public class UIManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+    
+    public static string ToRoman(int number)
+    {
+        if (number < 1) return string.Empty;
+        if (number >= 1000) return "M" + ToRoman(number - 1000);
+        if (number >= 900) return "CM" + ToRoman(number - 900);
+        if (number >= 500) return "D" + ToRoman(number - 500);
+        if (number >= 400) return "CD" + ToRoman(number - 400);
+        if (number >= 100) return "C" + ToRoman(number - 100);
+        if (number >= 90) return "XC" + ToRoman(number - 90);
+        if (number >= 50) return "L" + ToRoman(number - 50);
+        if (number >= 40) return "XL" + ToRoman(number - 40);
+        if (number >= 10) return "X" + ToRoman(number - 10);
+        if (number >= 9) return "IX" + ToRoman(number - 9);
+        if (number >= 5) return "V" + ToRoman(number - 5);
+        if (number >= 4) return "IV" + ToRoman(number - 4);
+        if (number >= 1) return "I" + ToRoman(number - 1);
+        throw new ArgumentOutOfRangeException("something bad happened");
     }
 
     public void UpdatePoints(int points)
@@ -55,8 +77,26 @@ public class UIManager : MonoBehaviour
         ammunitionDisplay.text = text;
     }
 
-    public void UpdateReloadDisplay(string text)
+    public void UpdatePromptMessage(string message)
     {
-        promptDisplay.text = text;
+        promptMessage.text = message;
+    }
+    
+    public void UpdateReloadingText(string message)
+    {
+        reloadingText.text = message;
+    }
+    
+    public void UpdateWaveNumber(int wave)
+    {
+        waveNumber.text = ToRoman(wave);
+    }
+    
+    public void UpdateWaveTimer(float time)
+    {
+        if (time <= 0.5)
+            waveTimer.text = "";
+        else
+            waveTimer.text = "Next wave in: " + Mathf.Ceil(time).ToString() + "s";
     }
 }

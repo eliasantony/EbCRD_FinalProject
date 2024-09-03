@@ -5,7 +5,7 @@ public class PlayerHunger : MonoBehaviour
 {
     public float maxHunger = 100f;
     public float currentHunger;
-    public float hungerDecayRate = 0.75f;   // Hunger depletion per tick
+    public float hungerDecayRate = 0.5f;    // Hunger depletion per tick
     public float healthDecayRate = 0.5f;    // Health decay rate when hunger is zero
     public float tickSpeed = 1f;            // Time in seconds between each tick
     private float tickTimer = 0f;           // Time since the last tick
@@ -42,6 +42,7 @@ public class PlayerHunger : MonoBehaviour
     public void EatFood(float amount)
     {
         currentHunger = Mathf.Clamp(currentHunger + amount, 0, maxHunger);
+        UIManager.instance.UpdateHunger(currentHunger / maxHunger); // Update UI when food is eaten
     }
 
     public bool IsFull()

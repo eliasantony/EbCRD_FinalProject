@@ -6,16 +6,16 @@ public class AmmoShop : MonoBehaviour
 
     public bool BuyAmmo(ProjectileGun gun)
     {
-        if (gun != null && playerPoints.SpendPoints(gun.ammoCost))
-        {
-            gun.AddAmmo(gun.magazineSize); // Add one magazine worth of ammo
-            UIManager.instance.UpdateAmmoDisplay(gun.bulletsLeft + " / " + gun.totalAmmo);
-            return true;
-        }
-        else
-        {
-            UIManager.instance.UpdateReloadDisplay("Not enough points or no weapon equipped!");
-            return false;
-        }
+        return GameManager.instance.PurchaseAmmo(gun);
+    }
+}
+
+public class WeaponShop : MonoBehaviour
+{
+    public PlayerPoints playerPoints;
+
+    public bool BuyGun(ProjectileGun gun)
+    {
+        return GameManager.instance.PurchaseGun(gun);
     }
 }

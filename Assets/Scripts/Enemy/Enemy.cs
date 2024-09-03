@@ -8,112 +8,107 @@ public class Enemy : MonoBehaviour
     [Header("Enemy Stats")]
     public float health;
     public float maxHealth;
-    public float speed;
+    public float baseSpeed;
     public float attackRange;
     public float attackDamage;
     public float attackCooldown;
     private float lastAttackTime;
-    
+
     // Reference to the Player
-    private PlayerHealth player;
+    private GameObject player;
 
     [Header("Health Bar")]
     public GameObject healthBarUI;
     public Slider healthBar;
 
-    private Transform playerTransform;
     public NavMeshAgent agent;
-    //private Animator animator;
-    
     private WaveManager waveManager;
     private bool isDead = false;
 
-    public void Start()
+    void Start()
     {
         health = maxHealth;
         healthBar.value = CalculateHealth();
-        player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>();
-        playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
+        player = GameObject.FindGameObjectWithTag("Player");
         agent = GetComponent<NavMeshAgent>();
-        agent.speed = speed;
-        //animator = GetComponent<Animator>();
+        
+        // Add randomness to enemy speed
+        agent.speed = baseSpeed + Random.Range(-0.5f, 0.5f); // Adding a small random variation to speed
+
         waveManager = GameObject.FindObjectOfType<WaveManager>();
     }
-    
+
     void Update()
     {
-        if (isDead) return; 
+        if (isDead) return;
 
         healthBar.value = CalculateHealth();
+        healthBarUI.SetActive(health < maxHealth); // Show health bar only when damaged
 
-        if (health < maxHealth)
-        {
-            healthBarUI.SetActive(true);
-        }
         if (health <= 0)
         {
             Die();
+            return; // Exit early if dead
         }
 
-        if (health > maxHealth)
+        // Stop moving if within attack range
+        if (Vector3.Distance(transform.position, player.transform.position) <= attackRange)
         {
-            health = maxHealth;
+            Debug.Log("Player within attack range");
+            agent.isStopped = true;
+            if (Time.time - lastAttackTime >= attackCooldown)
+            {
+                Attack();
+                lastAttackTime = Time.time;
+            }
         }
-
-        
-        Vector3 direction = playerTransform.position - transform.position;
-        direction.y = 0;
-        transform.rotation = Quaternion.LookRotation(direction);
-
-        //agent.SetDestination(playerTransform.position); 
-        //animator.SetFloat("MoveSpeed", agent.velocity.magnitude);
-        
-        Debug.Log("Distance to player: " + Vector3.Distance(transform.position, playerTransform.position));
-        // Debug.Log("Distance to player (Agent): " + agent.remainingDistance(playerTransform.position));
-        
-        if (Vector3.Distance(transform.position, playerTransform.position) <= attackRange 
-            && Time.time - lastAttackTime >= attackCooldown) // Check if enough time has passed since the last attack
+        else
         {
-            Attack();
-            lastAttackTime = Time.time; // Update the last attack time
+            agent.isStopped = false;
+            agent.SetDestination(player.transform.position);
         }
     }
 
     public void TakeDamage(string damageType)
     {
-        Debug.Log("Taking damage from: " + damageType);
+        Debug.Log("Enemy hit (" + damageType + ")");
+        float damageAmount = 0;
+
         switch (damageType)
         {
             case "Bullet":
-                Debug.Log("Bullet Damage: 20");
-                health -= 20f;
-                //player.GetComponent<PlayerHealth>().AddPoints(10); // Add points to the player
+                damageAmount = 20f;
                 break;
             case "Explosion":
-                Debug.Log("Explosion Damage: 50");
-                health -= 50f;
-                //player.GetComponent<PlayerHealth>().AddPoints(25); // Add points to the player
+                damageAmount = 50f;
                 break;
             case "Melee":
-                Debug.Log("Melee Damage: 20");
-                health -= 20f;
-                //player.GetComponent<PlayerHealth>().AddPoints(15); // Add points to the player
+                damageAmount = 20f;
                 break;
             default:
                 break;
+        }
+
+        health -= damageAmount;
+        GameManager.instance.AddPoints(10);
+
+        if (health <= 0)
+        {
+            Die();
         }
     }
 
     void Attack()
     {
         Debug.Log("Attacking player");
-        //animator.SetTrigger("Attack");
-        Invoke("DealDamage", 0.5f);
+        DealDamage();
+        // animator.SetTrigger("Attack");
+        // Invoke("DealDamage", 0.5f); // Delay the actual damage to sync with attack animation
     }
-    
+
     void DealDamage()
     {
-        player.TakeDamage(attackDamage);
+        player.GetComponent<PlayerHealth>().TakeDamage(attackDamage);
     }
 
     float CalculateHealth()
@@ -123,18 +118,18 @@ public class Enemy : MonoBehaviour
 
     void Die()
     {
-        if (isDead) return; // Ensure Die is only called once
+        if (isDead) return;
 
-        isDead = true; // Mark the enemy as dead
-        
-        //animator.SetBool("Dead", true);
-        
+        isDead = true;
         agent.isStopped = true; // Stop the enemy from moving
+        // animator.SetBool("Dead", true); // Trigger death animation if you have one
+
+        waveManager.ZombieKilled(); // Notify the WaveManager that this zombie has died
         
-        // Notify the WaveManager that this zombie has died
-        waveManager.ZombieKilled();
-        
-        // Destroy the enemy object after a delay to allow death animation to play
-        Destroy(gameObject, 2f); 
+        // Award points for killing the enemy
+        GameManager.instance.AddPoints(50); // Example: Award 50 points for a kill
+
+        // Add any additional death effects here (e.g., sound, loot)
+        Destroy(gameObject);
     }
 }
