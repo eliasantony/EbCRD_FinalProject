@@ -22,8 +22,11 @@ public class Enemy : MonoBehaviour
     public Slider healthBar;
 
     public NavMeshAgent agent;
+    public GameObject model;
+    private Animator animator;
     private WaveManager waveManager;
     private bool isDead = false;
+    private bool isAttacking = false;
 
     void Start()
     {
@@ -31,15 +34,18 @@ public class Enemy : MonoBehaviour
         healthBar.value = CalculateHealth();
         player = GameObject.FindGameObjectWithTag("Player");
         agent = GetComponent<NavMeshAgent>();
-        
-        // Add randomness to enemy speed
-        agent.speed = baseSpeed + Random.Range(-0.5f, 0.5f); // Adding a small random variation to speed
+        animator = GetComponentInChildren<Animator>();
 
+        // Add randomness to enemy speed
+        agent.speed = baseSpeed + Random.Range(-0.5f, 0.5f);
         waveManager = GameObject.FindObjectOfType<WaveManager>();
     }
 
     void Update()
     {
+        model.transform.localPosition = Vector3.zero;
+        model.transform.LookAt(player.transform);
+        
         if (isDead) return;
 
         healthBar.value = CalculateHealth();
@@ -51,11 +57,17 @@ public class Enemy : MonoBehaviour
             return; // Exit early if dead
         }
 
+        // If currently attacking, do not move or start another attack
+        if (isAttacking) return;
+
+        float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+
         // Stop moving if within attack range
-        if (Vector3.Distance(transform.position, player.transform.position) <= attackRange)
+        if (distanceToPlayer <= attackRange)
         {
-            Debug.Log("Player within attack range");
-            agent.isStopped = true;
+            agent.isStopped = true; // Stop NavMeshAgent from moving
+            animator.SetBool("isRunning", false); // Stop running animation
+
             if (Time.time - lastAttackTime >= attackCooldown)
             {
                 Attack();
@@ -66,12 +78,12 @@ public class Enemy : MonoBehaviour
         {
             agent.isStopped = false;
             agent.SetDestination(player.transform.position);
+            animator.SetBool("isRunning", true);
         }
     }
 
     public void TakeDamage(string damageType)
     {
-        Debug.Log("Enemy hit (" + damageType + ")");
         float damageAmount = 0;
 
         switch (damageType)
@@ -83,7 +95,7 @@ public class Enemy : MonoBehaviour
                 damageAmount = 50f;
                 break;
             case "Melee":
-                damageAmount = 20f;
+                damageAmount = 25f;
                 break;
             default:
                 break;
@@ -100,20 +112,36 @@ public class Enemy : MonoBehaviour
 
     void Attack()
     {
-        Debug.Log("Attacking player");
-        DealDamage();
-        // animator.SetTrigger("Attack");
-        // Invoke("DealDamage", 0.5f); // Delay the actual damage to sync with attack animation
+        if (isAttacking) return;
+        isAttacking = true;
+        int attackType = Random.Range(0, 6); 
+        animator.SetInteger("attackType", attackType);
+        float[] attackTimes = { 1.3f, 0.6f, 1f, 1.2f, 0.6f, 1f };
+        animator.SetTrigger("attack");
+        StartCoroutine(ResetAttackFlag());
+        Invoke("DealDamage", attackTimes[attackType]);
+    }
+
+    IEnumerator ResetAttackFlag()
+    {
+        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        yield return new WaitForSeconds(stateInfo.length);
+        isAttacking = false;
+        agent.isStopped = false;
+        animator.SetBool("isRunning", true);
     }
 
     void DealDamage()
     {
-        player.GetComponent<PlayerHealth>().TakeDamage(attackDamage);
+        if (Vector3.Distance(transform.position, player.transform.position) <= attackRange) // Check if player is still in range
+        {
+            player.GetComponent<PlayerHealth>().TakeDamage(attackDamage);
+        }
     }
 
     float CalculateHealth()
     {
-        return health / maxHealth; // Calculate the health percentage
+        return health / maxHealth;
     }
 
     void Die()
@@ -121,15 +149,12 @@ public class Enemy : MonoBehaviour
         if (isDead) return;
 
         isDead = true;
-        agent.isStopped = true; // Stop the enemy from moving
-        // animator.SetBool("Dead", true); // Trigger death animation if you have one
+        agent.isStopped = true;
+        healthBarUI.SetActive(false);
+        animator.SetTrigger("death");
 
-        waveManager.ZombieKilled(); // Notify the WaveManager that this zombie has died
-        
-        // Award points for killing the enemy
-        GameManager.instance.AddPoints(50); // Example: Award 50 points for a kill
-
-        // Add any additional death effects here (e.g., sound, loot)
-        Destroy(gameObject);
+        waveManager.ZombieKilled();
+        GameManager.instance.AddPoints(50);
+        Destroy(gameObject, 1f); // Delay to allow death animation to play
     }
 }

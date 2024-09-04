@@ -14,20 +14,23 @@ public class PickUpController : MonoBehaviour
 
     public float pickUpRange;
     public float dropForwardForce, dropUpwardForce;
-    
+
     private Vector3 originalPosition;
     private Quaternion originalRotation;
 
     public bool equipped;
     public bool slotFull; // Removed static keyword
 
+    private WeaponManager weaponManager; // Reference to WeaponManager
+
     private void Start()
     {
         _inputManager = GameObject.FindGameObjectWithTag("Player").GetComponent<InputManager>();
-        
+        weaponManager = GameObject.FindGameObjectWithTag("Player").GetComponent<WeaponManager>();
+
         originalPosition = gunContainer.localPosition;
         originalRotation = gunContainer.localRotation;
-        
+
         // Setup
         if (!equipped)
         {
@@ -75,7 +78,7 @@ public class PickUpController : MonoBehaviour
             Drop();
         }
     }
-    
+
     private void HandleAiming()
     {
         if (Input.GetMouseButtonDown(1)) // Right mouse button pressed
@@ -89,7 +92,7 @@ public class PickUpController : MonoBehaviour
             gunContainer.localRotation = originalRotation;
         }
     }
-    
+
     private void ShowPromptMessage()
     {
         if (!gunScript.isPurchased)
@@ -101,7 +104,7 @@ public class PickUpController : MonoBehaviour
             UIManager.instance.UpdatePromptMessage("Press E to pick up the weapon.");
         }
     }
-    
+
     private void AttemptPickUp()
     {
         if (!gunScript.isPurchased)
@@ -141,6 +144,9 @@ public class PickUpController : MonoBehaviour
         gunScript.enabled = true;
         gunScript.LoadAmmoState();
 
+        // Add the gun to the WeaponManager
+        weaponManager.EquipGun(gameObject);
+
         // Clear prompt after pickup
         UIManager.instance.UpdatePromptMessage("");
     }
@@ -173,5 +179,11 @@ public class PickUpController : MonoBehaviour
         // Save ammo state and disable script
         gunScript.SaveAmmoState();
         gunScript.enabled = false;
+
+        // Inform WeaponManager to drop the gun
+        weaponManager.DropGun();
+
+        // Clear prompt after drop
+        UIManager.instance.UpdatePromptMessage("");
     }
 }

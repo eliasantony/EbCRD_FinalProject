@@ -28,6 +28,9 @@ public class WaveManager : MonoBehaviour
 
     private void Update()
     {
+        // Update the spawn position to follow the player
+        transform.position = playerTransform.position;
+
         if (zombiesRemaining <= 0 && !waveInProgress)
         {
             Debug.Log("Wave complete! Starting next wave...");
@@ -61,6 +64,12 @@ public class WaveManager : MonoBehaviour
             {
                 Instantiate(zombiePrefab, spawnPosition, Quaternion.identity);
             }
+            else
+            {
+                zombiesRemaining--; // Decrement the count if no valid spawn position is found
+                Debug.LogWarning("No valid spawn position found. Reducing remaining zombie count.");
+            }
+
             yield return new WaitForSeconds(spawnInterval);
         }
 
@@ -69,7 +78,7 @@ public class WaveManager : MonoBehaviour
 
     Vector3 FindValidSpawnPosition()
     {
-        for (int attempts = 0; attempts < 25; attempts++)
+        for (int attempts = 0; attempts < 30; attempts++)
         {
             Vector3 randomDirection = Random.insideUnitSphere * spawnRadius;
             randomDirection += playerTransform.position;
@@ -77,9 +86,8 @@ public class WaveManager : MonoBehaviour
             // Use NavMesh.SamplePosition to check if the point is on the NavMesh
             if (NavMesh.SamplePosition(randomDirection, out hit, 2f, NavMesh.AllAreas))
             {
-                if (hit.position.y < 1.5f) // Ensure the spawn is not on a rooftop or above the ground floor level
+                if (hit.position.y < 1.5)
                 {
-                    // Ensure the point is at a reasonable distance from the player
                     if (Vector3.Distance(hit.position, playerTransform.position) > 5f) 
                     {
                         return hit.position;
@@ -87,8 +95,8 @@ public class WaveManager : MonoBehaviour
                 }
             }
         }
-        Debug.LogWarning("Failed to find a valid spawn position after 15 attempts.");
-        return Vector3.zero; // Return zero vector if no valid position found
+        Debug.LogWarning("Failed to find a valid spawn position after 30 attempts.");
+        return Vector3.zero;
     }
 
     public void ZombieKilled()
@@ -106,6 +114,6 @@ public class WaveManager : MonoBehaviour
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, spawnRadius);
+        Gizmos.DrawWireSphere(playerTransform ? playerTransform.position : transform.position, spawnRadius);
     }
 }
