@@ -22,12 +22,10 @@ public class FoodInteractable : Interactable
             if (playerHunger != null && !playerHunger.IsFull())
             {
                 playerHunger.EatFood(hungerAmount);
-                Debug.Log("Food purchased! Hunger increased.");
             }
         }
         else
         {
-            Debug.Log("Not enough points to purchase food.");
             UIManager.instance.UpdatePromptMessage("Not enough points to purchase food.");
         }
     }

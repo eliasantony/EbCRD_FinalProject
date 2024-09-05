@@ -33,7 +33,6 @@ public class WaveManager : MonoBehaviour
 
         if (zombiesRemaining <= 0 && !waveInProgress)
         {
-            Debug.Log("Wave complete! Starting next wave...");
             StartCoroutine(WaitAndStartNextWave());
         }
     }

@@ -62,6 +62,12 @@ public class ProjectileGun : MonoBehaviour
     public ConfigLoader configLoader;
     public bool isPurchased = false;
     
+    // Powerups
+    private bool instantKillActive = false;
+    private int originalTotalAmmo; // before the power-up
+    private int originalMagazineAmmo; // before the power-up
+    private bool unlimitedAmmoActive = false;
+    
     private void Awake()
     {
         _inputManager = GameObject.FindGameObjectWithTag("Player").GetComponent<InputManager>();
@@ -191,6 +197,12 @@ public class ProjectileGun : MonoBehaviour
         
         // Instantiate bullet
         GameObject currentBullet = Instantiate(bullet, attackPoint.position, Quaternion.identity);
+        
+        // Instant Kill ?
+        CustomBullet bulletScript = currentBullet.GetComponent<CustomBullet>(); 
+        bulletScript.isInstantKillActive = instantKillActive;
+
+        
         // Rotate bullet to shoot direction
         currentBullet.transform.forward = directionWithSpread.normalized;
         Destroy(currentBullet, 2f);
@@ -294,5 +306,40 @@ public class ProjectileGun : MonoBehaviour
     public void MarkAsPurchased()
     {
         isPurchased = true;
+    }
+    
+    // For handling unlimited ammo
+    public void SetUnlimitedAmmo(bool isActive)
+    {
+        if (isActive)
+        {
+            // Store current ammo values before applying unlimited ammo
+            if (!unlimitedAmmoActive)
+            {
+                originalTotalAmmo = totalAmmo;
+                originalMagazineAmmo = bulletsLeft;
+            }
+
+            unlimitedAmmoActive = true;
+            totalAmmo = int.MaxValue; // Set to essentially unlimited number
+            bulletsLeft = magazineSize; // Refill magazine to full
+        }
+        else
+        {
+            unlimitedAmmoActive = false;
+        
+            // Reset ammo to original values if the power-up wears off
+            if (totalAmmo == int.MaxValue)
+            {
+                totalAmmo = originalTotalAmmo;
+                bulletsLeft = originalMagazineAmmo;
+            }
+        }
+    }
+
+    // For handling instant kill
+    public void SetInstantKill(bool isActive)
+    {
+        instantKillActive = isActive;
     }
 }

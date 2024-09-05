@@ -24,12 +24,10 @@ public class MediPackInteractable : Interactable
             if (playerHealth != null && playerHealth.GetCurrentHealth() < playerHealth.maxHealth)
             {
                 playerHealth.Heal(healAmount);
-                Debug.Log("Medipack purchased! Health increased.");
             }
         }
         else
         {
-            Debug.Log("Not enough points to purchase medipack.");
             UIManager.instance.UpdatePromptMessage("Not enough points to purchase medipack.");
         }
     }

@@ -27,6 +27,11 @@ public class Enemy : MonoBehaviour
     private WaveManager waveManager;
     private bool isDead = false;
     private bool isAttacking = false;
+    
+    [Header("Powerup Drop")]
+    public GameObject[] powerUpPrefabs;
+
+    public float powerUpDropChance = 0.5f;
 
     void Start()
     {
@@ -88,8 +93,17 @@ public class Enemy : MonoBehaviour
 
         switch (damageType)
         {
+            case "InstantKill":
+                health = 0; // Set health to 0 instantly
+                break;
             case "Bullet":
                 damageAmount = 20f;
+                break;
+            case "MachineGun":
+                damageAmount = 10f;
+                break;
+            case "Sniper":
+                damageAmount = 100f;
                 break;
             case "Explosion":
                 damageAmount = 50f;
@@ -101,8 +115,12 @@ public class Enemy : MonoBehaviour
                 break;
         }
 
-        health -= damageAmount;
-        GameManager.instance.AddPoints(10);
+        if (damageType != "InstantKill")
+        {
+            health -= damageAmount;
+        }
+        
+        GameManager.instance.AddPoints(25);
 
         if (health <= 0)
         {
@@ -154,7 +172,7 @@ public class Enemy : MonoBehaviour
         animator.SetTrigger("death");
 
         waveManager.ZombieKilled();
-        GameManager.instance.AddPoints(50);
+        GameManager.instance.AddPoints(100);
         Destroy(gameObject, 1f); // Delay to allow death animation to play
     }
 }

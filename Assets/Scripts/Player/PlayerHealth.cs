@@ -14,6 +14,7 @@ public class PlayerHealth : MonoBehaviour
     public float duration;
     public float fadeSpeed;
     private float durationTimer;
+    private bool shieldActive = false;
     
     void Start()
     {
@@ -59,11 +60,20 @@ public class PlayerHealth : MonoBehaviour
             health = Mathf.Lerp(oldHealth, newHealth, elapsed / duration);
             yield return null;
         }
-        health = newHealth;
+        if (newHealth <= 0)
+            GameManager.instance.GameOver();
+        else
+            health = newHealth;
     }
 
     public void TakeDamage(float damage)
     {
+        if (shieldActive)
+        {
+            Debug.Log("Shield blocked the damage!");
+            return; // If the shield is active, don't take any damage
+        }
+        
         float newHealth = Mathf.Max(health - damage, 0);
         durationTimer = 0;
         overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, 0.7f);
@@ -80,4 +90,22 @@ public class PlayerHealth : MonoBehaviour
     {
         return health;
     }
+    
+    public void HealToFull()
+    {
+        StartCoroutine(AnimateHealthChange(maxHealth));
+    }
+
+    public void EnableShield()
+    {
+        shieldActive = true;
+        Debug.Log("Shield enabled");
+    }
+
+    public void DisableShield()
+    {
+        shieldActive = false;
+        Debug.Log("Shield disabled");
+    }
+
 }

@@ -9,6 +9,9 @@ public class PlayerStamina : MonoBehaviour
     public float staminaRegenRate = 5f; // Stamina regeneration per second
     public float idleRegenMultiplier = 2f; // Additional regen multiplier when idle
     private PlayerMotor playerMotor;
+    private bool unlimitedStamina = false;
+    private bool speedBoostActive = false;
+    private float originalSpeed;
 
     void Start()
     {
@@ -24,6 +27,12 @@ public class PlayerStamina : MonoBehaviour
 
     private void HandleStamina()
     {
+        if (unlimitedStamina)
+        {
+            currentStamina = maxStamina; // Keep stamina full if unlimited
+            return;
+        }
+        
         if (playerMotor.IsSprinting() && currentStamina > 0)
         {
             currentStamina -= sprintStaminaCost * Time.deltaTime;
@@ -50,9 +59,25 @@ public class PlayerStamina : MonoBehaviour
             playerMotor.SetCanSprint(true); // Allow sprinting when stamina is fully regenerated
         }
     }
-
-    public void ModifyStamina(float amount)
+    
+    public void SetUnlimitedStamina(bool isActive)
     {
-        currentStamina = Mathf.Clamp(currentStamina + amount, 0, maxStamina);
+        unlimitedStamina = isActive;
+        Debug.Log("Unlimited Stamina is " + (isActive ? "ON" : "OFF"));
+    }
+
+    public void SetSpeedBoost(bool isActive)
+    {
+        speedBoostActive = isActive;
+        if (isActive)
+        {
+            originalSpeed = playerMotor.speed; // Assuming you have a playerMotor controlling speed
+            playerMotor.speed *= 1.5f; // Increase speed by 50%
+        }
+        else
+        {
+            playerMotor.speed = originalSpeed;
+        }
+        Debug.Log("Speed Boost is " + (isActive ? "ON" : "OFF"));
     }
 }

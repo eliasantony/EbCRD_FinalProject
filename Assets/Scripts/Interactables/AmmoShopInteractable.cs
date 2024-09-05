@@ -19,8 +19,7 @@ public class AmmoShopInteractable : Interactable
 
         if (currentGun == null)
         {
-            Debug.Log("No gun equipped. Cannot purchase ammo.");
-            UIManager.instance.UpdatePromptMessage("No gun equipped. Cannot purchase ammo.");
+           UIManager.instance.UpdatePromptMessage("No gun equipped. Cannot purchase ammo.");
             return;
         }
         
@@ -30,11 +29,9 @@ public class AmmoShopInteractable : Interactable
         {
             currentGun.AddAmmo(currentGun.magazineSize);
             UIManager.instance.UpdateAmmoDisplay(currentGun.bulletsLeft + " / " + currentGun.totalAmmo);
-            Debug.Log("Ammo purchased! Ammo increased.");
         }
         else
         {
-            Debug.Log("Not enough points to purchase ammo.");
             UIManager.instance.UpdatePromptMessage("Not enough points to purchase ammo.");
         }
     }

@@ -31,7 +31,6 @@ public class MeleeWeapon : MonoBehaviour
 
     void Attack()
     {
-        Debug.Log("Axe Attack");
         lastAttackTime = Time.time;
 
         // Play attack animation immediately
@@ -57,7 +56,6 @@ public class MeleeWeapon : MonoBehaviour
                 if (enemy != null)
                 {
                     enemy.TakeDamage("Melee");
-                    Debug.Log("Enemy hit with axe, applying damage");
                 }
             }
         }
