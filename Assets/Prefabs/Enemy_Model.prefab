@@ -81,6 +81,14 @@ MonoBehaviour:
   healthBar: {fileID: 1529804705672720492}
   agent: {fileID: 6092739805054227111}
   model: {fileID: 2083700642975968292}
+  powerUpPrefabs:
+  - {fileID: 5072353115282699588, guid: 87e20d8044b54044d8c3f0500bb48b32, type: 3}
+  - {fileID: 6418470404942038353, guid: 50957867a76dafa4bb6e4115f70cca86, type: 3}
+  - {fileID: 4708248264642420593, guid: 35373be2698ae344d9606fb131cfcf1e, type: 3}
+  - {fileID: 4877216587493030437, guid: 2e792995c51ec1e45a680e040a3c84bc, type: 3}
+  - {fileID: 3376943670266096333, guid: 7be192b48a0e0884ead4bb4106087838, type: 3}
+  - {fileID: 326264239846447533, guid: c7ba76edbdb1dd64b9ae31e1158ffbf9, type: 3}
+  powerUpDropChance: 1
 --- !u!195 &6092739805054227111
 NavMeshAgent:
   m_ObjectHideFlags: 0

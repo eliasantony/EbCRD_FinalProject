@@ -31,7 +31,7 @@ public class Enemy : MonoBehaviour
     [Header("Powerup Drop")]
     public GameObject[] powerUpPrefabs;
 
-    public float powerUpDropChance = 0.5f;
+    public float powerUpDropChance = 1f;
 
     void Start()
     {
@@ -170,9 +170,21 @@ public class Enemy : MonoBehaviour
         agent.isStopped = true;
         healthBarUI.SetActive(false);
         animator.SetTrigger("death");
-
         waveManager.ZombieKilled();
         GameManager.instance.AddPoints(100);
+        TryDropPowerUp();
         Destroy(gameObject, 1f); // Delay to allow death animation to play
+    }
+    
+    void TryDropPowerUp()
+    {
+        
+        if (powerUpPrefabs.Length > 0 && Random.value <= powerUpDropChance)
+        {
+            int randomIndex = Random.Range(0, powerUpPrefabs.Length);
+            GameObject powerUp = powerUpPrefabs[randomIndex];
+            Debug.Log("Dropping power-up: " + powerUp.name);
+            Instantiate(powerUp, new Vector3(transform.position.x, transform.position.y + 1, transform.position.z), Quaternion.identity);
+        }
     }
 }

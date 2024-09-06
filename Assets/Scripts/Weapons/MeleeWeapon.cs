@@ -9,6 +9,7 @@ public class MeleeWeapon : MonoBehaviour
     public float attackRange = 1.5f; // Range of the melee attack
     public float attackCooldown = 0.5f; // Time between attacks
     private float lastAttackTime = 0f;
+    private bool instantKillActive = false;
 
     private Animator animator;
     private AudioSource audioSource;
@@ -27,6 +28,11 @@ public class MeleeWeapon : MonoBehaviour
         {
             Attack();
         }
+    }
+    
+    public void SetInstantKill(bool active)
+    {
+        instantKillActive = active;
     }
 
     void Attack()
@@ -55,7 +61,14 @@ public class MeleeWeapon : MonoBehaviour
                 Enemy enemy = hitCollider.GetComponent<Enemy>();
                 if (enemy != null)
                 {
-                    enemy.TakeDamage("Melee");
+                    if (instantKillActive)
+                    {
+                        enemy.TakeDamage("InstantKill");
+                    }
+                    else
+                    {
+                        enemy.TakeDamage("Melee");
+                    }
                 }
             }
         }
