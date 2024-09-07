@@ -50,7 +50,6 @@ public class PlayerPowerUpController : MonoBehaviour
             {
                 _equippedGun = GetComponentInChildren<ProjectileGun>();
                 _equippedGun?.SetUnlimitedAmmo(false);
-                Debug.Log("Unlimited Ammo power-up expired.");
                 RemovePowerUp("Unlimited Ammo");
             }
         }

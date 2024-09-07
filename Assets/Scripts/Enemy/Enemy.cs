@@ -90,8 +90,6 @@ public class Enemy : MonoBehaviour
     public void TakeDamage(string damageType)
     {
         float damageAmount = 0;
-
-        Debug.Log("Damage type: " + damageType);
         
         switch (damageType)
         {
@@ -173,7 +171,7 @@ public class Enemy : MonoBehaviour
         healthBarUI.SetActive(false);
         animator.SetTrigger("death");
         waveManager.ZombieKilled();
-        GameManager.instance.AddPoints(100);
+        GameManager.instance.AddPoints(150);
         TryDropPowerUp();
         Destroy(gameObject, 1f); // Delay to allow death animation to play
     }

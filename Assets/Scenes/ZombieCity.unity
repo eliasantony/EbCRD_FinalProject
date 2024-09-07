@@ -9024,7 +9024,7 @@ MonoBehaviour:
   useEvents: 0
   promptMessage: 
   foodPrice: 300
-  hungerAmount: 20
+  hungerAmount: 50
 --- !u!1 &297929245
 GameObject:
   m_ObjectHideFlags: 0
@@ -62383,9 +62383,10 @@ MonoBehaviour:
   zombiePrefab: {fileID: 646512030646296221, guid: ee22278a0bb83854baf645b10b0e5254, type: 3}
   spawnRadius: 25
   initialWaveSize: 2
-  timeBetweenWaves: 15
+  timeBetweenWaves: 10
   waveMultiplier: 1.5
   spawnInterval: 1
+  initialWaitTime: 15
 --- !u!4 &1636099894 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5372839472002766991, guid: 3ff9c98c0990fce468bb0d49a51b6461, type: 3}

@@ -64,7 +64,14 @@ public class PickUpController : MonoBehaviour
         {
             if (hit.transform == transform)
             {
-                ShowPromptMessage();
+                if (!gunScript.isPurchased)
+                {
+                    UIManager.instance.UpdatePromptMessage($"Press E to buy {gunScript.weaponName} for {gunScript.price} points.");
+                }
+                else
+                {
+                    UIManager.instance.UpdatePromptMessage("Press E to pick up the weapon.");
+                }
                 if (!equipped && _inputManager._onFootActions.Interact.triggered && !slotFull)
                 {
                     AttemptPickUp();
@@ -97,18 +104,6 @@ public class PickUpController : MonoBehaviour
         }
     }
 
-    private void ShowPromptMessage()
-    {
-        if (!gunScript.isPurchased)
-        {
-            UIManager.instance.UpdatePromptMessage($"Press E to buy {gunScript.weaponName} for {gunScript.price} points.");
-        }
-        else
-        {
-            UIManager.instance.UpdatePromptMessage("Press E to pick up the weapon.");
-        }
-    }
-
     private void AttemptPickUp()
     {
         if (!gunScript.isPurchased)
@@ -125,11 +120,9 @@ public class PickUpController : MonoBehaviour
     {
         // Try purchasing the gun via coroutine
         yield return StartCoroutine(GameManager.instance.PurchaseGun(gunScript));
-        Debug.Log("Coroutine finished: " + GameManager.instance.PurchaseGun(gunScript));
         // If purchase was successful, pick up and mark as purchased
         if (gunScript.isPurchased)
         {
-            Debug.Log("Purchased weapon: " + gunScript.weaponName + " ? " + gunScript.isPurchased);
             PickUp();
         }
         else
@@ -141,8 +134,6 @@ public class PickUpController : MonoBehaviour
 
     private void PickUp()
     {
-        Debug.Log($"Picking up weapon: {gunScript.weaponName}");
-        
         equipped = true;
         slotFull = true;
         UIManager.instance.EnableAmmoDisplay(true);

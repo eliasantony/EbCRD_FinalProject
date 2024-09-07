@@ -7,7 +7,7 @@ public class PlayerPoints : MonoBehaviour
 
     public void Start()
     {
-        points = 600;
+        points = 300;
         UIManager.instance.UpdatePoints(points);
     }
 

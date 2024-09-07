@@ -56,7 +56,6 @@ public class CustomBullet : MonoBehaviour
             Enemy enemy = enemies[i].GetComponent<Enemy>();
             if (enemy != null)
             {
-                Debug.Log("Instant kill active: " + isInstantKillActive);
                 if (isInstantKillActive)
                 {
                     enemy.TakeDamage("InstantKill"); // New damage type for instant kill

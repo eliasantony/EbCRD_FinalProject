@@ -12,6 +12,7 @@ public class WaveManager : MonoBehaviour
     public float timeBetweenWaves = 20f;
     public float waveMultiplier = 1.5f;
     public float spawnInterval = 1f;
+    public float initialWaitTime = 15f; // New variable for initial wait time
 
     private int currentWave = 0;
     private int zombiesToSpawn;
@@ -22,7 +23,7 @@ public class WaveManager : MonoBehaviour
     private void Start()
     {
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
-        StartCoroutine(WaitAndStartNextWave());
+        StartCoroutine(WaitAndStartNextWave(initialWaitTime)); // Pass initial wait time
     }
 
     private void Update()
@@ -32,18 +33,18 @@ public class WaveManager : MonoBehaviour
 
         if (zombiesRemaining <= 0 && !waveInProgress)
         {
-            StartCoroutine(WaitAndStartNextWave());
+            StartCoroutine(WaitAndStartNextWave(timeBetweenWaves)); // Use timeBetweenWaves for subsequent waves
         }
     }
 
-    IEnumerator WaitAndStartNextWave()
+    IEnumerator WaitAndStartNextWave(float waitTime)
     {
         waveInProgress = true;
         currentWave++;
         zombiesToSpawn = Mathf.RoundToInt(initialWaveSize * Mathf.Pow(waveMultiplier, currentWave - 1));
         zombiesRemaining = zombiesToSpawn;
 
-        for (float timer = timeBetweenWaves; timer > 0; timer -= Time.deltaTime)
+        for (float timer = waitTime; timer > 0; timer -= Time.deltaTime)
         {
             UIManager.instance.UpdateWaveNumber(currentWave);
             UIManager.instance.UpdateWaveTimer(timer);
@@ -64,7 +65,7 @@ public class WaveManager : MonoBehaviour
             }
             else
             {
-                zombiesRemaining--; // Decrement the count if no valid spawn position is found
+                zombiesRemaining--;
                 Debug.LogWarning("No valid spawn position found. Reducing remaining zombie count.");
             }
 
@@ -81,12 +82,11 @@ public class WaveManager : MonoBehaviour
             Vector3 randomDirection = Random.insideUnitSphere * spawnRadius;
             randomDirection += playerTransform.position;
             NavMeshHit hit;
-            // Use NavMesh.SamplePosition to check if the point is on the NavMesh
             if (NavMesh.SamplePosition(randomDirection, out hit, 2f, NavMesh.AllAreas))
             {
                 if (hit.position.y < 1.5)
                 {
-                    if (Vector3.Distance(hit.position, playerTransform.position) > 5f) 
+                    if (Vector3.Distance(hit.position, playerTransform.position) > 5f)
                     {
                         return hit.position;
                     }
@@ -100,11 +100,9 @@ public class WaveManager : MonoBehaviour
     public void ZombieKilled()
     {
         zombiesRemaining--;
-        
-        // Start countdown to next wave if all zombies are dead
         if (zombiesRemaining <= 0 && !waveInProgress)
         {
-            StartCoroutine(WaitAndStartNextWave());
+            StartCoroutine(WaitAndStartNextWave(timeBetweenWaves));
         }
     }
 

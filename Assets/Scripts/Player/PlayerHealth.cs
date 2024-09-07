@@ -70,8 +70,7 @@ public class PlayerHealth : MonoBehaviour
     {
         if (shieldActive)
         {
-            Debug.Log("Shield blocked the damage!");
-            return; // If the shield is active, don't take any damage
+            return;
         }
         
         float newHealth = Mathf.Max(health - damage, 0);

@@ -16,7 +16,11 @@ public class StartScreenController : MonoBehaviour
 
     public void QuitGame()
     {
-        Application.Quit();
+        #if UNITY_WEBGL && !UNITY_EDITOR
+            Application.ExternalEval("window.close();");
+        #else
+            Application.Quit();
+        #endif
     }
     
     public void ShowControls()
