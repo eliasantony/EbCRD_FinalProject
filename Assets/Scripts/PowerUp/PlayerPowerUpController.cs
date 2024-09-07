@@ -14,6 +14,7 @@ public class PlayerPowerUpController : MonoBehaviour
     private float _unlimitedStaminaTimer;
     private float _shieldTimer;
     private float _speedBoostTimer;
+    private float _pointsMultiplierTimer;
 
     private PlayerHealth _playerHealth;
     private PlayerStamina _playerStamina;
@@ -30,7 +31,6 @@ public class PlayerPowerUpController : MonoBehaviour
     {
         _playerHealth = GetComponent<PlayerHealth>();
         _playerStamina = GetComponent<PlayerStamina>();
-        _equippedGun = GetComponentInChildren<ProjectileGun>();
         _equippedMelee = GetComponentInChildren<MeleeWeapon>();
     }
 
@@ -48,7 +48,9 @@ public class PlayerPowerUpController : MonoBehaviour
             _unlimitedAmmoTimer -= Time.deltaTime;
             if (_unlimitedAmmoTimer <= 0)
             {
+                _equippedGun = GetComponentInChildren<ProjectileGun>();
                 _equippedGun?.SetUnlimitedAmmo(false);
+                Debug.Log("Unlimited Ammo power-up expired.");
                 RemovePowerUp("Unlimited Ammo");
             }
         }
@@ -59,6 +61,7 @@ public class PlayerPowerUpController : MonoBehaviour
             if (_instantKillTimer <= 0)
             {
                 _equippedMelee?.SetInstantKill(false);
+                _equippedGun = GetComponentInChildren<ProjectileGun>();
                 _equippedGun?.SetInstantKill(false);
                 RemovePowerUp("Instant Kill");
             }
@@ -93,6 +96,16 @@ public class PlayerPowerUpController : MonoBehaviour
                 RemovePowerUp("Speed Boost");
             }
         }
+        
+        if (_pointsMultiplierTimer > 0)
+        {
+            _pointsMultiplierTimer -= Time.deltaTime;
+            if (_pointsMultiplierTimer <= 0)
+            {
+                GameManager.instance.SetPointsMultiplier(1f);
+                RemovePowerUp("Points Multiplier");
+            }
+        }
     }
 
     public void ActivatePowerUp(PowerUp.PowerUpType powerUpType, float duration)
@@ -100,20 +113,22 @@ public class PlayerPowerUpController : MonoBehaviour
         switch (powerUpType)
         {
             case PowerUp.PowerUpType.UnlimitedAmmo:
-                _unlimitedAmmoTimer = duration;
+                _unlimitedAmmoTimer += duration;
+                _equippedGun = GetComponentInChildren<ProjectileGun>();
                 _equippedGun?.SetUnlimitedAmmo(true);
                 AddPowerUpToUI("Unlimited Ammo", duration);
                 break;
 
             case PowerUp.PowerUpType.InstantKill:
-                _instantKillTimer = duration;
+                _instantKillTimer += duration;
                 _equippedMelee?.SetInstantKill(true);
+                _equippedGun = GetComponentInChildren<ProjectileGun>();
                 _equippedGun?.SetInstantKill(true);
                 AddPowerUpToUI("Instant Kill", duration);
                 break;
 
             case PowerUp.PowerUpType.UnlimitedStamina:
-                _unlimitedStaminaTimer = duration;
+                _unlimitedStaminaTimer += duration;
                 _playerStamina.SetUnlimitedStamina(true);
                 AddPowerUpToUI("Unlimited Stamina", duration);
                 break;
@@ -123,39 +138,48 @@ public class PlayerPowerUpController : MonoBehaviour
                 break;
 
             case PowerUp.PowerUpType.Shield:
-                _shieldTimer = duration;
+                _shieldTimer += duration;
                 _playerHealth.EnableShield();
                 AddPowerUpToUI("Shield", duration);
                 break;
 
             case PowerUp.PowerUpType.SpeedBoost:
-                _speedBoostTimer = duration;
+                _speedBoostTimer += duration;
                 _playerStamina.SetSpeedBoost(true);
                 AddPowerUpToUI("Speed Boost", duration);
                 break;
+            
+            case PowerUp.PowerUpType.PointsMultiplier:
+                _pointsMultiplierTimer += duration;
+                GameManager.instance.SetPointsMultiplier(2f);
+                AddPowerUpToUI("Points Multiplier", duration);
+                break;
         }
-
-        Debug.Log($"{powerUpType} activated for {duration} seconds.");
     }
-
-    // Add power-up to the UI when activated
-    private void AddPowerUpToUI(string powerUpName, float duration)
+    
+    private void AddPowerUpToUI(string powerUpName, float remainingTime)
     {
-        if (!activePowerUps.ContainsKey(powerUpName))
+        if (powerUpTexts.ContainsKey(powerUpName))
         {
-            activePowerUps[powerUpName] = duration;
+            // Update the remaining time in the existing UI text
+            powerUpTexts[powerUpName].text = $"{powerUpName}: {Mathf.Ceil(remainingTime)}s";
+        }
+        else
+        {
+            // Add a new UI element for this power-up if it's not already there
+            activePowerUps[powerUpName] = remainingTime;
             TextMeshProUGUI newPowerUpText = Instantiate(powerUpTextPrefab, powerUpPanel);
-            newPowerUpText.text = $"{powerUpName}: {Mathf.Ceil(duration)}s";
+            newPowerUpText.text = $"{powerUpName}: {Mathf.Ceil(remainingTime)}s";
             powerUpTexts[powerUpName] = newPowerUpText;
         }
     }
+
 
     // Update the power-up UI
     private void UpdatePowerUpUI()
     {
         List<string> powerUpsToRemove = new List<string>();
-
-        foreach (var powerUp in activePowerUps)
+        foreach (var powerUp in new Dictionary<string, float>(activePowerUps))
         {
             if (powerUpTexts.ContainsKey(powerUp.Key))
             {
@@ -168,13 +192,13 @@ public class PlayerPowerUpController : MonoBehaviour
                 }
             }
         }
-
-        // Remove any power-ups that have expired
+        
         foreach (string powerUp in powerUpsToRemove)
         {
             RemovePowerUp(powerUp);
         }
     }
+
 
     // Remove the power-up from the dictionary and UI
     private void RemovePowerUp(string powerUpName)

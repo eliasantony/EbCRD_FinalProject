@@ -71,6 +71,10 @@ public class PickUpController : MonoBehaviour
                 }
             }
         }
+        else
+        {
+            UIManager.instance.UpdatePromptMessage(""); // Clear the prompt when not looking at a weapon
+        }
 
         // Drop if equipped and "Q" is pressed
         if (equipped && _inputManager._onFootActions.Drop.triggered)
@@ -109,15 +113,7 @@ public class PickUpController : MonoBehaviour
     {
         if (!gunScript.isPurchased)
         {
-            if (GameManager.instance.PurchaseGun(gunScript))
-            {
-                PickUp();
-                gunScript.MarkAsPurchased();
-            }
-            else
-            {
-                UIManager.instance.UpdatePromptMessage("Not enough points to purchase this weapon!");
-            }
+            StartCoroutine(TryPurchaseGun());
         }
         else
         {
@@ -125,10 +121,31 @@ public class PickUpController : MonoBehaviour
         }
     }
 
+    private IEnumerator TryPurchaseGun()
+    {
+        // Try purchasing the gun via coroutine
+        yield return StartCoroutine(GameManager.instance.PurchaseGun(gunScript));
+        Debug.Log("Coroutine finished: " + GameManager.instance.PurchaseGun(gunScript));
+        // If purchase was successful, pick up and mark as purchased
+        if (gunScript.isPurchased)
+        {
+            Debug.Log("Purchased weapon: " + gunScript.weaponName + " ? " + gunScript.isPurchased);
+            PickUp();
+        }
+        else
+        {
+            UIManager.instance.UpdatePromptMessage("Not enough points to purchase this weapon!");
+        }
+    }
+
+
     private void PickUp()
     {
+        Debug.Log($"Picking up weapon: {gunScript.weaponName}");
+        
         equipped = true;
         slotFull = true;
+        UIManager.instance.EnableAmmoDisplay(true);
 
         // Make weapon a child of the camera and move it to default position
         transform.SetParent(gunContainer);
@@ -151,10 +168,11 @@ public class PickUpController : MonoBehaviour
         UIManager.instance.UpdatePromptMessage("");
     }
 
-    private void Drop()
+    internal void Drop()
     {
         equipped = false;
         slotFull = false;
+        UIManager.instance.EnableAmmoDisplay(false);
 
         // Set parent to null
         transform.SetParent(null);

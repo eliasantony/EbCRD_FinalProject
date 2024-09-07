@@ -1,38 +1,32 @@
+using System.Collections;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class ConfigLoader : MonoBehaviour
 {
     public GunConfig gunConfig;
-    // public BulletConfig bulletConfig;
 
-    public void LoadGunConfig(string weaponName)
+    public IEnumerator LoadGunConfig(string weaponName)
     {
         string path = Path.Combine(Application.streamingAssetsPath, weaponName + ".json");
-        if (File.Exists(path))
+
+        #if UNITY_WEBGL
+            // WebGL-specific file loading via HTTP
+            path = Path.Combine(Application.streamingAssetsPath, weaponName + ".json");
+        #endif
+
+        UnityWebRequest request = UnityWebRequest.Get(path);
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
         {
-            string json = File.ReadAllText(path);
-            gunConfig = JsonUtility.FromJson<GunConfig>(json);
+            gunConfig = JsonUtility.FromJson<GunConfig>(request.downloadHandler.text);
         }
         else
         {
-            Debug.LogError("Config file not found: " + path);
+            Debug.LogError("Error loading config file: " + request.error);
         }
     }
 
-    /*
-    public void LoadBulletConfig(string bulletName)
-    {
-        string path = Path.Combine(Application.streamingAssetsPath, bulletName + ".json");
-        if (File.Exists(path))
-        {
-            string json = File.ReadAllText(path);
-            bulletConfig = JsonUtility.FromJson<BulletConfig>(json);
-        }
-        else
-        {
-            Debug.LogError("Config file not found: " + path);
-        }
-    }
-    **/
 }

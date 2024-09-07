@@ -6,19 +6,18 @@ using UnityEngine.AI;
 public class WaveManager : MonoBehaviour
 {
     [Header("Wave Settings")]
-    public GameObject zombiePrefab; // The zombie prefab to spawn
-    public float spawnRadius = 20f; // Radius around the player to attempt spawning zombies
-    public int numberOfSpawnPoints = 8; // Number of spawn points
-    public int initialWaveSize = 5; // Initial number of zombies per wave
-    public float timeBetweenWaves = 20f; // Time between waves
-    public float waveMultiplier = 1.5f; // Multiplier to increase wave size
-    public float spawnInterval = 1f; // Time between each zombie spawn
+    public GameObject zombiePrefab;
+    public float spawnRadius = 20f;
+    public int initialWaveSize = 5;
+    public float timeBetweenWaves = 20f;
+    public float waveMultiplier = 1.5f;
+    public float spawnInterval = 1f;
 
-    private int currentWave = 0; // The current wave number
-    private int zombiesToSpawn; // Number of zombies to spawn in the current wave
-    private int zombiesRemaining; // Number of zombies remaining in the current wave
-    private Transform playerTransform; // Reference to the player's transform
-    private bool waveInProgress = false; // Flag to track if a wave is in progress
+    private int currentWave = 0;
+    private int zombiesToSpawn;
+    private int zombiesRemaining;
+    private Transform playerTransform;
+    private bool waveInProgress = false;
 
     private void Start()
     {
@@ -101,8 +100,7 @@ public class WaveManager : MonoBehaviour
     public void ZombieKilled()
     {
         zombiesRemaining--;
-        Debug.Log("Zombie killed! Zombies remaining: " + zombiesRemaining + " / " + zombiesToSpawn);
-
+        
         // Start countdown to next wave if all zombies are dead
         if (zombiesRemaining <= 0 && !waveInProgress)
         {

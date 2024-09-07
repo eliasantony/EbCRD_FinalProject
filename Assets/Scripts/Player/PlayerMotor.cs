@@ -13,7 +13,7 @@ public class PlayerMotor : MonoBehaviour
     public float aimSpeed = 2.5f;
     public float speed = 5.0f;
     public float gravity = -9.81f;
-    public float jumpHeight = 1.5f;
+    public float jumpHeight = 1f;
     
     public PickUpController _pickUpController;
     

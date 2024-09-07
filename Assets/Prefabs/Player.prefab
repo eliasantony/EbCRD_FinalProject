@@ -1,5 +1,37 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &623783570209658256
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3079613880940982165}
+  m_Layer: 0
+  m_Name: KnifeHolder
+  m_TagString: GunHolder
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3079613880940982165
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 623783570209658256}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.051995363, y: -0.7916309, z: -0.15440111, w: 0.5888779}
+  m_LocalPosition: {x: 0.3, y: -0.4, z: 0.48}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1371905458369055576}
+  m_Father: {fileID: 6197487039066631309}
+  m_LocalEulerAnglesHint: {x: -17.8, y: -105.77, z: -6}
 --- !u!1 &921122098539240522
 GameObject:
   m_ObjectHideFlags: 0
@@ -49,11 +81,12 @@ GameObject:
   - component: {fileID: 7992098196271272168}
   - component: {fileID: 6203013267757111924}
   - component: {fileID: 1904857371572463450}
-  - component: {fileID: 2165752573573858546}
   - component: {fileID: 5945069423049112217}
   - component: {fileID: 741753912563708023}
   - component: {fileID: 1975881933719554265}
   - component: {fileID: 4180987018808088757}
+  - component: {fileID: 5744125906887235201}
+  - component: {fileID: 3050343216634780547}
   m_Layer: 9
   m_Name: Player
   m_TagString: Player
@@ -207,7 +240,7 @@ MonoBehaviour:
   aimSpeed: 2.5
   speed: 5
   gravity: -9.81
-  jumpHeight: 1.5
+  jumpHeight: 1
   _pickUpController: {fileID: 0}
 --- !u!114 &6203013267757111924
 MonoBehaviour:
@@ -242,19 +275,6 @@ MonoBehaviour:
   interactableMask:
     serializedVersion: 2
     m_Bits: 64
---- !u!114 &2165752573573858546
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7348349299288079831}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: adc49cfa10fb70342b179e40b478acae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  promptText: {fileID: 0}
 --- !u!114 &5945069423049112217
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -283,7 +303,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bfe4376feb644a56a4de169b68388d78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  points: 0
+  points: 500
 --- !u!114 &1975881933719554265
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -318,6 +338,35 @@ MonoBehaviour:
   sprintStaminaCost: 10
   staminaRegenRate: 5
   idleRegenMultiplier: 2
+--- !u!114 &5744125906887235201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7348349299288079831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f2c9752c22a42da83778fa25dd0cde4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  knifeHolder: {fileID: 623783570209658256}
+  gunHolder: {fileID: 9138004906274049185}
+  meleeWeaponScript: {fileID: 3051536545324292936}
+--- !u!114 &3050343216634780547
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7348349299288079831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94a8678d12d647c2a2b21705bcc9f35a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  powerUpTextPrefab: {fileID: 3933597709452268631, guid: bf097a747bb5f294ba5b89da85f643c1, type: 3}
+  powerUpPanel: {fileID: 0}
 --- !u!1 &8620846451805813539
 GameObject:
   m_ObjectHideFlags: 0
@@ -350,6 +399,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4277490053599294027}
+  - {fileID: 3079613880940982165}
   m_Father: {fileID: 523383056489740818}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &4312744557012209000
@@ -442,3 +492,117 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6197487039066631309}
   m_LocalEulerAnglesHint: {x: -4, y: -185, z: 4}
+--- !u!1001 &3884532386694928208
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3079613880940982165}
+    m_Modifications:
+    - target: {fileID: 2801622839599455240, guid: c78b2f6da8c496044acf68bbb77bee45, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2801622839599455240, guid: c78b2f6da8c496044acf68bbb77bee45, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2801622839599455240, guid: c78b2f6da8c496044acf68bbb77bee45, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2801622839599455240, guid: c78b2f6da8c496044acf68bbb77bee45, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2801622839599455240, guid: c78b2f6da8c496044acf68bbb77bee45, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2801622839599455240, guid: c78b2f6da8c496044acf68bbb77bee45, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2801622839599455240, guid: c78b2f6da8c496044acf68bbb77bee45, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2801622839599455240, guid: c78b2f6da8c496044acf68bbb77bee45, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2801622839599455240, guid: c78b2f6da8c496044acf68bbb77bee45, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2801622839599455240, guid: c78b2f6da8c496044acf68bbb77bee45, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3290598117132601010, guid: c78b2f6da8c496044acf68bbb77bee45, type: 3}
+      propertyPath: m_Name
+      value: SM_Camping_Axe
+      objectReference: {fileID: 0}
+    - target: {fileID: 4009919533279016670, guid: c78b2f6da8c496044acf68bbb77bee45, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3290598117132601010, guid: c78b2f6da8c496044acf68bbb77bee45, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5965006556311098566}
+    - targetCorrespondingSourceObject: {fileID: 3290598117132601010, guid: c78b2f6da8c496044acf68bbb77bee45, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3051536545324292936}
+  m_SourcePrefab: {fileID: 100100000, guid: c78b2f6da8c496044acf68bbb77bee45, type: 3}
+--- !u!4 &1371905458369055576 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2801622839599455240, guid: c78b2f6da8c496044acf68bbb77bee45, type: 3}
+  m_PrefabInstance: {fileID: 3884532386694928208}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1748008063294607842 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3290598117132601010, guid: c78b2f6da8c496044acf68bbb77bee45, type: 3}
+  m_PrefabInstance: {fileID: 3884532386694928208}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &5965006556311098566
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1748008063294607842}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 6e6a4b9d3cf3aca4abe9602be4055503, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &3051536545324292936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1748008063294607842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11dcd767998945d1ba595a796b381ac3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponName: Knife
+  damage: 25
+  attackRange: 1.5
+  attackCooldown: 0.5

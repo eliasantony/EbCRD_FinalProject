@@ -91,10 +91,12 @@ public class Enemy : MonoBehaviour
     {
         float damageAmount = 0;
 
+        Debug.Log("Damage type: " + damageType);
+        
         switch (damageType)
         {
             case "InstantKill":
-                health = 0; // Set health to 0 instantly
+                Die();
                 break;
             case "Bullet":
                 damageAmount = 20f;
@@ -178,12 +180,10 @@ public class Enemy : MonoBehaviour
     
     void TryDropPowerUp()
     {
-        
         if (powerUpPrefabs.Length > 0 && Random.value <= powerUpDropChance)
         {
             int randomIndex = Random.Range(0, powerUpPrefabs.Length);
             GameObject powerUp = powerUpPrefabs[randomIndex];
-            Debug.Log("Dropping power-up: " + powerUp.name);
             Instantiate(powerUp, new Vector3(transform.position.x, transform.position.y + 1, transform.position.z), Quaternion.identity);
         }
     }

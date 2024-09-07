@@ -99,13 +99,11 @@ public class PlayerHealth : MonoBehaviour
     public void EnableShield()
     {
         shieldActive = true;
-        Debug.Log("Shield enabled");
     }
 
     public void DisableShield()
     {
         shieldActive = false;
-        Debug.Log("Shield disabled");
     }
 
 }

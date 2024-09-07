@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -35,8 +36,6 @@ public class GameManager : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-
-        AddPoints(10000); // Initial points for testing
     }
 
     public void Update()
@@ -45,12 +44,10 @@ public class GameManager : MonoBehaviour
         {
             if (Time.timeScale == 0f)
             {
-                pauseUI.SetActive(false);
                 ResumeGame();
             }
             else
             {
-                pauseUI.SetActive(true);
                 PauseGame();
             }
         }
@@ -59,7 +56,6 @@ public class GameManager : MonoBehaviour
     public void SetPointsMultiplier(float multiplier)
     {
         pointsMultiplier = multiplier;
-        Debug.Log("Points Multiplier set to: " + multiplier);
     }
 
     public void AddPoints(int points)
@@ -80,21 +76,26 @@ public class GameManager : MonoBehaviour
     }
 
     // Purchase a gun and provide it to the player
-    public bool PurchaseGun(ProjectileGun gun)
+    public IEnumerator PurchaseGun(ProjectileGun gun)
     {
-        configLoader.LoadGunConfig(gun.weaponName);
+        // Wait for the config to load
+        yield return StartCoroutine(configLoader.LoadGunConfig(gun.weaponName));
+
+        // Now we proceed after the config has been loaded
         GunConfig gunConfig = configLoader.gunConfig;
         int cost = gunConfig.price;
+
         if (SpendPoints(cost))
         {
-            // Instantiate or enable the gun in the player's inventory
             gun.totalAmmo = gun.magazineSize; // Only 1 magazine initially
             gun.bulletsLeft = gun.magazineSize;
+            gun.isPurchased = true;
             UIManager.instance.UpdateAmmoDisplay(gun.bulletsLeft + " / " + gun.totalAmmo);
-            return true;
+            yield return true;
         }
-        return false;
+        yield return false;
     }
+
 
     // Purchase ammo for the current gun
     public bool PurchaseAmmo(ProjectileGun gun)
@@ -128,6 +129,7 @@ public class GameManager : MonoBehaviour
     
     public void PauseGame()
     {
+        pauseUI.SetActive(true);
         Time.timeScale = 0f;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
@@ -135,6 +137,7 @@ public class GameManager : MonoBehaviour
 
     public void ResumeGame()
     {
+        pauseUI.SetActive(false);
         Time.timeScale = 1f;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;

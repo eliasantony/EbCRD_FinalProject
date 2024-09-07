@@ -72,40 +72,53 @@ public class ProjectileGun : MonoBehaviour
     {
         _inputManager = GameObject.FindGameObjectWithTag("Player").GetComponent<InputManager>();
         normalFOV = fpsCam.fieldOfView;
-        
-        // Make sure magazine is full
+    
+        // Start loading the config asynchronously
+        StartCoroutine(InitializeGun());
+    }
+
+    private IEnumerator InitializeGun()
+    {
+        // Make sure magazine is full (default values in case config fails)
         bulletsLeft = magazineSize;
         readyToShoot = true;
-        
-        configLoader.LoadGunConfig(weaponName);
 
+        // Start loading the config file
+        yield return StartCoroutine(configLoader.LoadGunConfig(weaponName));
+
+        // Ensure config has been loaded before assigning values
         GunConfig gunConfig = configLoader.gunConfig;
-        bulletsLeft = gunConfig.magazineSize;
-        readyToShoot = true;
 
-        // Use gunConfig fields in your script logic
-        shootForce = gunConfig.shootForce;
-        upwardForce = gunConfig.upwardForce;
-        timeBetweenShooting = gunConfig.timeBetweenShooting;
-        spread = gunConfig.spread;
-        normalSpread = spread;
-        aimSpread = spread * aimSpreadMultiplier;
-        aimHeight = gunConfig.aimHeight;
-        aimSide = gunConfig.aimSide;
-        reloadTime = gunConfig.reloadTime;
-        timeBetweenShots = gunConfig.timeBetweenShots;
-        magazineSize = gunConfig.magazineSize;
-        bulletsPerTap = gunConfig.bulletsPerTap;
-        allowButtonHold = gunConfig.allowButtonHold;
-        recoilForce = gunConfig.recoilForce;
-        price = gunConfig.price;
-        ammoCost = gunConfig.ammoCost;
-        
-        bulletsLeft = magazineSize;
-        readyToShoot = true;
+        if (gunConfig != null)
+        {
+            // Use gunConfig fields in your script logic
+            shootForce = gunConfig.shootForce;
+            upwardForce = gunConfig.upwardForce;
+            timeBetweenShooting = gunConfig.timeBetweenShooting;
+            spread = gunConfig.spread;
+            normalSpread = spread;
+            aimSpread = spread * aimSpreadMultiplier;
+            aimHeight = gunConfig.aimHeight;
+            aimSide = gunConfig.aimSide;
+            reloadTime = gunConfig.reloadTime;
+            timeBetweenShots = gunConfig.timeBetweenShots;
+            magazineSize = gunConfig.magazineSize;
+            bulletsPerTap = gunConfig.bulletsPerTap;
+            allowButtonHold = gunConfig.allowButtonHold;
+            recoilForce = gunConfig.recoilForce;
+            price = gunConfig.price;
+            ammoCost = gunConfig.ammoCost;
 
-        // Initialize total ammo
-        totalAmmo = magazineSize * 2; // Start with two magazines
+            bulletsLeft = magazineSize;
+            readyToShoot = true;
+
+            // Initialize total ammo
+            totalAmmo = magazineSize * 2; // Start with two magazines
+        }
+        else
+        {
+            Debug.LogError("Gun config failed to load.");
+        }
     }
     
     private void Update()
@@ -134,16 +147,24 @@ public class ProjectileGun : MonoBehaviour
     private void UpdateUI()
     {
         // Set ammo display
-        if(UIManager.instance != null)
-            UIManager.instance.UpdateAmmoDisplay(bulletsLeft/bulletsPerTap + " / " + totalAmmo/bulletsPerTap);
+        if (UIManager.instance != null)
+        {
+            if (bulletsPerTap != 0)
+            {
+                UIManager.instance.UpdateAmmoDisplay(bulletsLeft / bulletsPerTap + " / " + totalAmmo / bulletsPerTap);
+            }
+            else
+            {
+                UIManager.instance.UpdateAmmoDisplay("N/A");
+            }
+        }
         
         // Set reload display
         if(UIManager.instance != null)
         {
-            // Debug.Log("Reloading: " + reloading);
             if (bulletsLeft <= 0 && !reloading)
                 UIManager.instance.UpdateReloadingText("Press R to reload");
-            else if (reloading)
+            else if (reloading && totalAmmo > 0)
                 UIManager.instance.UpdateReloadingText("Reloading...");
             else
                 UIManager.instance.UpdateReloadingText("");
@@ -261,7 +282,7 @@ public class ProjectileGun : MonoBehaviour
         else
         {
             // Play empty ammo sound or feedback
-            Debug.Log("No ammo left!");
+            // Debug.Log("No ammo left!");
         }
     }
     
@@ -321,20 +342,16 @@ public class ProjectileGun : MonoBehaviour
             }
 
             unlimitedAmmoActive = true;
-            totalAmmo = int.MaxValue; // Set to essentially unlimited number
-            bulletsLeft = magazineSize; // Refill magazine to full
+            totalAmmo = 5000;
+            bulletsLeft = 5000; // Refill magazine to full
         }
         else
         {
             unlimitedAmmoActive = false;
-        
-            // Reset ammo to original values if the power-up wears off
-            if (totalAmmo == int.MaxValue)
-            {
-                totalAmmo = originalTotalAmmo;
-                bulletsLeft = originalMagazineAmmo;
-            }
+            totalAmmo = originalTotalAmmo;
+            bulletsLeft = originalMagazineAmmo;
         }
+        UpdateUI();
     }
 
     // For handling instant kill

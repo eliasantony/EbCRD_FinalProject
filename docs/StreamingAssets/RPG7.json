@@ -1,0 +1,14 @@
+{
+  "shootForce": 300,
+  "upwardForce": 0,
+  "timeBetweenShooting": 0,
+  "spread": 0.3,
+  "reloadTime": 3,
+  "timeBetweenShots": 3,
+  "magazineSize": 1,
+  "bulletsPerTap":  1,
+  "allowButtonHold": false,
+  "recoilForce": 200,
+  "aimHeight": 0.5,
+  "aimSide": 0
+}

@@ -1,0 +1,16 @@
+{
+  "shootForce": 600,
+  "upwardForce": 0,
+  "timeBetweenShooting": 1,
+  "spread": 0,
+  "reloadTime": 3,
+  "timeBetweenShots": 1,
+  "magazineSize": 6,
+  "bulletsPerTap":  1,
+  "allowButtonHold": false,
+  "recoilForce": 0,
+  "aimHeight": -0.08,
+  "aimSide": 0,
+  "price": 4000,
+  "ammoCost": 1000
+}

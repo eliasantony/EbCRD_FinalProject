@@ -1,0 +1,10 @@
+{
+  "bounciness": 0.1,
+  "useGravity": true,
+  "explosionDamage": 100,
+  "explosionRange": 5,
+  "explosionForce": 1000,
+  "maxCollisions": 1,
+  "maxLifetime": 5,
+  "explodeOnTouch": true
+}

@@ -88,7 +88,7 @@ MonoBehaviour:
   - {fileID: 4877216587493030437, guid: 2e792995c51ec1e45a680e040a3c84bc, type: 3}
   - {fileID: 3376943670266096333, guid: 7be192b48a0e0884ead4bb4106087838, type: 3}
   - {fileID: 326264239846447533, guid: c7ba76edbdb1dd64b9ae31e1158ffbf9, type: 3}
-  powerUpDropChance: 1
+  powerUpDropChance: 0.2
 --- !u!195 &6092739805054227111
 NavMeshAgent:
   m_ObjectHideFlags: 0

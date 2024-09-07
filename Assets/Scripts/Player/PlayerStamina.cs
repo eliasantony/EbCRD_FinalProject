@@ -63,7 +63,6 @@ public class PlayerStamina : MonoBehaviour
     public void SetUnlimitedStamina(bool isActive)
     {
         unlimitedStamina = isActive;
-        Debug.Log("Unlimited Stamina is " + (isActive ? "ON" : "OFF"));
     }
 
     public void SetSpeedBoost(bool isActive)
@@ -78,6 +77,5 @@ public class PlayerStamina : MonoBehaviour
         {
             playerMotor.speed = originalSpeed;
         }
-        Debug.Log("Speed Boost is " + (isActive ? "ON" : "OFF"));
     }
 }

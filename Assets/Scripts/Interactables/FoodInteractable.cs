@@ -5,7 +5,7 @@ using UnityEngine;
 public class FoodInteractable : Interactable
 {
     public int foodPrice = 300; // Set price for food
-    public float hungerAmount = 20f; // Amount to increase hunger
+    public float hungerAmount = 50f; // Amount to increase hunger
     private GameObject player;
 
     private void Start()

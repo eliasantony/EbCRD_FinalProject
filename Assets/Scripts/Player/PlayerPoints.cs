@@ -7,14 +7,13 @@ public class PlayerPoints : MonoBehaviour
 
     public void Start()
     {
-        //points = 0;
+        points = 600;
         UIManager.instance.UpdatePoints(points);
     }
 
     public void AddPoints(int amount)
     {
         points += amount;
-        UIManager.instance.UpdatePoints(points);
     }
 
     public bool SpendPoints(int amount)

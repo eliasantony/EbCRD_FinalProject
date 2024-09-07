@@ -72,6 +72,11 @@ public class UIManager : MonoBehaviour
         staminaBar.fillAmount = stamina;
     }
     
+    public void EnableAmmoDisplay(bool enabled)
+    {
+        ammunitionDisplay.gameObject.SetActive(enabled);
+    }
+    
     public void UpdateAmmoDisplay(string text)
     {
         ammunitionDisplay.text = text;

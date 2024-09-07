@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class AmmoShop : MonoBehaviour
@@ -16,6 +17,6 @@ public class WeaponShop : MonoBehaviour
 
     public bool BuyGun(ProjectileGun gun)
     {
-        return GameManager.instance.PurchaseGun(gun);
+        throw new NotImplementedException();
     }
 }
